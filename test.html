@@ -1,1 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fatigue Observer</title>
+  <style>
+    :root {
+      --bg: #f5f6f8;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --green: #22c55e;
+      --green-soft: #dcfce7;
+      --yellow: #facc15;
+      --orange: #fb923c;
+      --red: #f87171;
+      --purple: #a78bfa;
+      --blue: #60a5fa;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #eef2f7 0%, #f8fafc 100%);
+      color: var(--text);
+      padding: 24px;
+    }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .topbar h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    .topbar p {
+      margin: 6px 0 0;
+      color: var(--muted);
+    }
+
+    .screen-picker {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .screen-picker button {
+      border: 1px solid var(--line);
+      background: white;
+      padding: 10px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .screen-picker button.active {
+      background: #111827;
+      color: white;
+      border-color: #111827;
+    }
+
+    .phone-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .phone {
+      background: #0f172a;
+      padding: 10px;
+      border-radius: 34px;
+      box-shadow: var(--shadow);
+      display: none;
+    }
+
+    .phone.active,
+    .phone.show-all {
+      display: block;
+    }
+
+    .screen {
+      background: var(--bg);
+      min-height: 720px;
+      border-radius: 26px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .status {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 18px 6px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .content {
+      padding: 10px 16px 90px;
+      flex: 1;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .muted { color: var(--muted); }
+    .small { font-size: 13px; }
+    .tiny { font-size: 12px; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-top: 14px;
+    }
+
+    .menu-icon, .bell, .icon-btn {
+      font-size: 20px;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .hello {
+      margin-top: 10px;
+    }
+
+    .hello h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .quick-moods {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .mood {
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .mood .circle {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 8px;
+      font-size: 24px;
+      border: 3px solid transparent;
+    }
+
+    .mood.selected .circle { border-color: #111827; }
+
+    .bg-green { background: #dcfce7; }
+    .bg-yellow { background: #fef9c3; }
+    .bg-orange { background: #ffedd5; }
+    .bg-red { background: #fee2e2; }
+    .bg-blue { background: #dbeafe; }
+    .bg-purple { background: #ede9fe; }
+
+    .summary-list, .mini-stats, .insight-list, .help-list, .report-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .summary-item, .help-item, .report-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .summary-left, .help-left, .report-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .dot-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+    }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .action {
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .action .dot-icon {
+      margin: 0 auto 8px;
+    }
+
+    .nav {
+      position: sticky;
+      bottom: 0;
+      background: rgba(255,255,255,0.95);
+      border-top: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      padding: 12px 8px;
+      backdrop-filter: blur(12px);
+    }
+
+    .nav div {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .nav .active-tab {
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .chip-row, .range-row, .context-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .chip, .range-chip, .context-chip {
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: white;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .chip.selected, .range-chip.selected, .context-chip.selected {
+      background: var(--green-soft);
+      border-color: #86efac;
+      color: #166534;
+      font-weight: 700;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 90px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      font: inherit;
+      margin-top: 10px;
+      background: white;
+    }
+
+    .primary-btn {
+      width: 100%;
+      border: none;
+      background: var(--green);
+      color: white;
+      padding: 16px;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 16px;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .stat-box {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 12px;
+    }
+
+    .meter {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: conic-gradient(var(--orange) 0 216deg, #f3f4f6 216deg 360deg);
+      display: grid;
+      place-items: center;
+      margin-left: auto;
+    }
+
+    .meter-inner {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: white;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 1fr 120px auto;
+      gap: 10px;
+      align-items: center;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+
+    .bar {
+      height: 8px;
+      border-radius: 999px;
+      background: #f3f4f6;
+      overflow: hidden;
+    }
+
+    .bar > div {
+      height: 100%;
+      border-radius: 999px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .tabs button {
+      flex: 1;
+      padding: 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: white;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .tabs button.active {
+      background: var(--green);
+      color: white;
+      border-color: var(--green);
+    }
+
+    .chart {
+      margin-top: 14px;
+      background: linear-gradient(180deg, #fff7ed 0%, #ffffff 100%);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 12px;
+    }
+
+    svg { width: 100%; height: auto; }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 700px) {
+      body { padding: 14px; }
+      .phone-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h1>Fatigue Observer</h1>
+        <p>Simple HTML front-end only mockup.</p>
+      </div>
+      <div class="screen-picker">
+        <button class="picker active" data-screen="all">Show All</button>
+        <button class="picker" data-screen="home">Home</button>
+        <button class="picker" data-screen="log">New Log</button>
+        <button class="picker" data-screen="summary">Summary</button>
+        <button class="picker" data-screen="trends">Trends</button>
+        <button class="picker" data-screen="insights">Insights</button>
+        <button class="picker" data-screen="report">Report</button>
+      </div>
+    </div>
+
+    <div class="phone-grid">
+      <!-- Home -->
+      <div class="phone active show-all" data-name="home">
+        <div class="screen">
+          <div class="status"><span>9:41</span><span>📶 🔋</span></div>
+          <div class="content">
+            <div class="row">
+              <button class="menu-icon">☰</button>
+              <button class="bell">🔔</button>
+            </div>
+
+            <div class="hello">
+              <h2>Good morning, Alex 👋</h2>
+              <p class="muted">How are you feeling today?</p>
+            </div>
+
+            <div class="card">
+              <div class="row">
+                <strong>Quick Log</strong>
+              </div>
+              <p class="muted tiny">Tap how you feel right now</p>
+              <div class="quick-moods" id="homeMoods">
+                <div class="mood" data-label="Good"><div class="circle bg-green">😊</div><div class="tiny">Good</div></div>
+                <div class="mood" data-label="Okay"><div class="circle bg-yellow">😐</div><div class="tiny">Okay</div></div>
+                <div class="mood selected" data-label="Tired"><div class="circle bg-orange">😟</div><div class="tiny">Tired</div></div>
+                <div class="mood" data-label="Very Tired"><div class="circle bg-red">😫</div><div class="tiny">Very Tired</div></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="row">
+                <strong>Today's Summary</strong>
+                <span class="tiny muted">Logged at 8:45 AM</span>
+              </div>
+              <div class="summary-list" style="margin-top:12px;">
+                <div class="summary-item">
+                  <div class="summary-left"><div class="dot-icon bg-blue">💧</div><span>Fatigue Level</span></div>
+                  <span class="muted">Tired</span>
+                </div>
+                <div class="summary-item">
+                  <div class="summary-left"><div class="dot-icon bg-purple">⚡</div><span>Energy</span></div>
+                  <span class="muted">Low</span>
+                </div>
+                <div class="summary-item">
+                  <div class="summary-left"><div class="dot-icon bg-yellow">🌙</div><span>Sleep Quality</span></div>
+                  <span class="muted">Poor</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <strong>Quick Actions</strong>
+              <div class="quick-actions">
+                <div class="action"><div class="dot-icon bg-green">➕</div>Log Event</div>
+                <div class="action"><div class="dot-icon bg-purple">👤</div>Symptoms</div>
+                <div class="action"><div class="dot-icon bg-blue">📈</div>Timeline</div>
+                <div class="action"><div class="dot-icon bg-yellow">💡</div>Insights</div>
+              </div>
+            </div>
+          </div>
+          <div class="nav">
+            <div class="active-tab">🏠<br>Home</div>
+            <div>📝<br>Log</div>
+            <div>🕒<br>Timeline</div>
+            <div>📊<br>Trends</div>
+            <div>⋯<br>More</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- New Log -->
+      <div class="phone active show-all" data-name="log">
+        <div class="screen">
+          <div class="status"><span>9:41</span><span>📶 🔋</span></div>
+          <div class="content">
+            <div class="row">
+              <button class="icon-btn">←</button>
+              <strong>New Log</strong>
+              <button class="icon-btn">📅</button>
+            </div>
+
+            <div class="card">
+              <div class="row">
+                <strong>Today, 24 May 2025</strong>
+                <span class="chip selected">🕒 8:45 AM</span>
+              </div>
+
+              <h3 style="margin:18px 0 8px; font-size:18px;">How do you feel?</h3>
+              <div class="quick-moods" id="logMoods">
+                <div class="mood" data-label="Good"><div class="circle bg-green">😊</div><div class="tiny">Good</div></div>
+                <div class="mood" data-label="Okay"><div class="circle bg-yellow">😐</div><div class="tiny">Okay</div></div>
+                <div class="mood selected" data-label="Tired"><div class="circle bg-orange">😟</div><div class="tiny">Tired</div></div>
+                <div class="mood" data-label="Very Tired"><div class="circle bg-red">😫</div><div class="tiny">Very Tired</div></div>
+              </div>
+
+              <h3 style="margin:18px 0 8px; font-size:18px;">Select symptoms</h3>
+              <p class="muted tiny">Choose all that apply</p>
+              <div class="chip-row">
+                <div class="chip selected">Fatigue</div>
+                <div class="chip selected">Low energy</div>
+                <div class="chip">Headache</div>
+                <div class="chip">Dizziness</div>
+                <div class="chip">Weakness</div>
+                <div class="chip">Brain fog</div>
+                <div class="chip">+ More</div>
+              </div>
+
+              <h3 style="margin:18px 0 8px; font-size:18px;">Add a note</h3>
+              <textarea placeholder="Type anything that might be useful..."></textarea>
+
+              <h3 style="margin:18px 0 8px; font-size:18px;">Add context</h3>
+              <div class="context-row">
+                <div class="context-chip">Sleep</div>
+                <div class="context-chip selected">Stress</div>
+                <div class="context-chip">Activity</div>
+                <div class="context-chip">Illness</div>
+                <div class="context-chip">Other</div>
+              </div>
+
+              <button class="primary-btn" onclick="alert('Front-end only demo: log saved visually only.')">Save Log</button>
+            </div>
+          </div>
+          <div class="nav">
+            <div>🏠<br>Home</div>
+            <div class="active-tab">📝<br>Log</div>
+            <div>🕒<br>Timeline</div>
+            <div>📊<br>Trends</div>
+            <div>⋯<br>More</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="phone active show-all" data-name="summary">
+        <div class="screen">
+          <div class="status"><span>9:41</span><span>📶 🔋</span></div>
+          <div class="content">
+            <div class="row">
+              <button class="icon-btn">←</button>
+              <strong>Daily Summary</strong>
+              <button class="icon-btn">📅</button>
+            </div>
+
+            <div class="card">
+              <div class="row">
+                <div>
+                  <div class="small muted">Fatigue Level</div>
+                  <div style="font-size:20px; font-weight:700; color: var(--orange); margin-top:6px;">Tired</div>
+                </div>
+                <div class="meter">
+                  <div class="meter-inner">6<br><span class="tiny muted">/10</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="stat-grid">
+              <div class="stat-box"><div class="tiny muted">Energy</div><div style="margin-top:8px; font-weight:700; color:var(--red);">Low</div><div class="tiny muted">3/10</div></div>
+              <div class="stat-box"><div class="tiny muted">Sleep Quality</div><div style="margin-top:8px; font-weight:700; color:var(--purple);">Poor</div><div class="tiny muted">2/10</div></div>
+              <div class="stat-box"><div class="tiny muted">Stress Level</div><div style="margin-top:8px; font-weight:700; color:var(--orange);">Medium</div><div class="tiny muted">5/10</div></div>
+            </div>
+
+            <div class="card">
+              <strong>Top Symptoms</strong>
+              <p class="tiny muted">You reported 3 symptoms</p>
+              <div class="bar-row"><span>Fatigue</span><div class="bar"><div style="width:78%; background: var(--orange);"></div></div><span style="color:var(--orange)">Severe</span></div>
+              <div class="bar-row"><span>Low energy</span><div class="bar"><div style="width:55%; background: #f59e0b;"></div></div><span style="color:#d97706">Moderate</span></div>
+              <div class="bar-row"><span>Headache</span><div class="bar"><div style="width:24%; background: var(--green);"></div></div><span style="color:var(--green)">Mild</span></div>
+            </div>
+
+            <div class="card">
+              <div class="row"><strong>Notes</strong><span>✏️</span></div>
+              <p class="muted">Felt tired after a long meeting.</p>
+            </div>
+          </div>
+          <div class="nav">
+            <div>🏠<br>Home</div>
+            <div>📝<br>Log</div>
+            <div class="active-tab">🕒<br>Timeline</div>
+            <div>📊<br>Trends</div>
+            <div>⋯<br>More</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trends -->
+      <div class="phone active show-all" data-name="trends">
+        <div class="screen">
+          <div class="status"><span>9:41</span><span>📶 🔋</span></div>
+          <div class="content">
+            <div class="row">
+              <strong>Trends</strong>
+              <button class="icon-btn">📅</button>
+            </div>
+
+            <div class="tabs">
+              <button class="active">Week</button>
+              <button>Month</button>
+              <button>3 Months</button>
+            </div>
+
+            <div class="card">
+              <div class="row"><strong>18 - 24 May 2025</strong><span class="muted">Weekly view</span></div>
+              <div class="chart">
+                <div class="tiny muted" style="margin-bottom:8px;">Fatigue Level (Daily Average)</div>
+                <svg viewBox="0 0 300 150" aria-label="fatigue chart">
+                  <line x1="20" y1="130" x2="280" y2="130" stroke="#d1d5db" stroke-width="1"/>
+                  <line x1="20" y1="20" x2="20" y2="130" stroke="#d1d5db" stroke-width="1"/>
+                  <polyline fill="none" stroke="#fb923c" stroke-width="4" points="20,110 60,70 100,78 140,52 180,74 220,66 260,45"/>
+                  <circle cx="20" cy="110" r="4" fill="#fb923c"/>
+                  <circle cx="60" cy="70" r="4" fill="#fb923c"/>
+                  <circle cx="100" cy="78" r="4" fill="#fb923c"/>
+                  <circle cx="140" cy="52" r="4" fill="#fb923c"/>
+                  <circle cx="180" cy="74" r="4" fill="#fb923c"/>
+                  <circle cx="220" cy="66" r="4" fill="#fb923c"/>
+                  <circle cx="260" cy="45" r="4" fill="#fb923c"/>
+                  <text x="20" y="145" font-size="10">Sun</text>
+                  <text x="60" y="145" font-size="10">Mon</text>
+                  <text x="100" y="145" font-size="10">Tue</text>
+                  <text x="140" y="145" font-size="10">Wed</text>
+                  <text x="180" y="145" font-size="10">Thu</text>
+                  <text x="220" y="145" font-size="10">Fri</text>
+                  <text x="260" y="145" font-size="10">Sat</text>
+                </svg>
+              </div>
+            </div>
+
+            <div class="two-col">
+              <div class="card" style="margin-top:0;">
+                <div class="tiny muted">Most tired on</div>
+                <div style="font-size:28px; color: var(--orange); font-weight:700; margin-top:8px;">Thursday</div>
+                <div class="muted">7.6 /10</div>
+              </div>
+              <div class="card" style="margin-top:0;">
+                <div class="tiny muted">Best day</div>
+                <div style="font-size:28px; color: var(--green); font-weight:700; margin-top:8px;">Sunday</div>
+                <div class="muted">4.2 /10</div>
+              </div>
+            </div>
+          </div>
+          <div class="nav">
+            <div>🏠<br>Home</div>
+            <div>📝<br>Log</div>
+            <div>🕒<br>Timeline</div>
+            <div class="active-tab">📊<br>Trends</div>
+            <div>⋯<br>More</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Insights -->
+      <div class="phone active show-all" data-name="insights">
+        <div class="screen">
+          <div class="status"><span>9:41</span><span>📶 🔋</span></div>
+          <div class="content">
+            <div class="row">
+              <button class="icon-btn">←</button>
+              <strong>Insights</strong>
+              <button class="icon-btn">ⓘ</button>
+            </div>
+
+            <div class="card">
+              <strong>Your patterns</strong>
+              <div class="insight-list" style="margin-top:14px;">
+                <div class="help-item"><div class="help-left"><div class="dot-icon bg-green">📅</div><span>You tend to feel more tired on Thursdays.</span></div></div>
+                <div class="help-item"><div class="help-left"><div class="dot-icon bg-purple">🌙</div><span>Poor sleep days are linked to higher fatigue.</span></div></div>
+                <div class="help-item"><div class="help-left"><div class="dot-icon bg-yellow">⚡</div><span>Lower stress days show better energy.</span></div></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <strong>What can help?</strong>
+              <div class="help-list" style="margin-top:14px;">
+                <div class="help-item"><div class="help-left"><div class="dot-icon bg-purple">🛏️</div><span>Try to get 7–8 hours of sleep.</span></div></div>
+                <div class="help-item"><div class="help-left"><div class="dot-icon bg-yellow">☕</div><span>Take short breaks during long meetings.</span></div></div>
+                <div class="help-item"><div class="help-left"><div class="dot-icon bg-green">🚶</div><span>Light exercise improves energy.</span></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="nav">
+            <div>🏠<br>Home</div>
+            <div>📝<br>Log</div>
+            <div>🕒<br>Timeline</div>
+            <div class="active-tab">📊<br>Trends</div>
+            <div>⋯<br>More</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Report -->
+      <div class="phone active show-all" data-name="report">
+        <div class="screen">
+          <div class="status"><span>9:41</span><span>📶 🔋</span></div>
+          <div class="content">
+            <div class="row">
+              <button class="icon-btn">←</button>
+              <strong>Export Report</strong>
+              <button class="icon-btn">⋯</button>
+            </div>
+
+            <div class="card report-item">
+              <div class="report-left">
+                <div class="dot-icon bg-green">📄</div>
+                <div>
+                  <strong>Generate a summary</strong>
+                  <div class="tiny muted">For your doctor or records</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <strong>Select data range</strong>
+              <div class="range-row">
+                <div class="range-chip">7 Days</div>
+                <div class="range-chip selected">30 Days</div>
+                <div class="range-chip">3 Months</div>
+                <div class="range-chip">Custom</div>
+              </div>
+            </div>
+
+            <div class="card">
+              <strong>Include in report</strong>
+              <div class="check-row"><input type="checkbox" checked> <span>Fatigue levels</span></div>
+              <div class="check-row"><input type="checkbox" checked> <span>Symptoms</span></div>
+              <div class="check-row"><input type="checkbox" checked> <span>Notes</span></div>
+              <div class="check-row"><input type="checkbox" checked> <span>Trends & insights</span></div>
+              <button class="primary-btn" onclick="alert('Front-end only demo: report generation is not connected yet.')">Generate Report</button>
+            </div>
+          </div>
+          <div class="nav">
+            <div>🏠<br>Home</div>
+            <div>📝<br>Log</div>
+            <div>🕒<br>Timeline</div>
+            <div>📊<br>Trends</div>
+            <div class="active-tab">⋯<br>More</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Show selected screen or all screens.
+    const pickerButtons = document.querySelectorAll('.picker');
+    const phones = document.querySelectorAll('.phone');
+
+    pickerButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        pickerButtons.forEach(b => b.classList.remove('active'));
+        button.classList.add('active');
+
+        const target = button.dataset.screen;
+        phones.forEach(phone => {
+          phone.classList.remove('active', 'show-all');
+
+          if (target === 'all') {
+            phone.classList.add('active', 'show-all');
+          } else if (phone.dataset.name === target) {
+            phone.classList.add('active');
+          }
+        });
+      });
+    });
+
+    // Simple mood selection behaviour.
+    function setupMoodGroup(containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      const moods = container.querySelectorAll('.mood');
+      moods.forEach(mood => {
+        mood.addEventListener('click', () => {
+          moods.forEach(m => m.classList.remove('selected'));
+          mood.classList.add('selected');
+        });
+      });
+    }
+
+    setupMoodGroup('homeMoods');
+    setupMoodGroup('logMoods');
+
+    // Toggle chips.
+    document.querySelectorAll('.chip, .context-chip, .range-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        if (chip.classList.contains('range-chip')) {
+          chip.parentElement.querySelectorAll('.range-chip').forEach(c => c.classList.remove('selected'));
+          chip.classList.add('selected');
+        } else {
+          chip.classList.toggle('selected');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
 
