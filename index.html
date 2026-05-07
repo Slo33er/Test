@@ -3,819 +3,1186 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fatigue Observer</title>
+  <title>Starforger: Moon Mender</title>
   <style>
     :root {
-      --bg: #f5f6f8;
-      --card: #ffffff;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --line: #e5e7eb;
-      --green: #22c55e;
-      --green-soft: #dcfce7;
-      --yellow: #facc15;
-      --orange: #fb923c;
-      --red: #f87171;
+      --void: #070914;
+      --night: #10162c;
+      --panel: rgba(14, 22, 45, 0.82);
+      --panel-strong: rgba(16, 27, 55, 0.95);
+      --line: rgba(125, 176, 255, 0.25);
+      --text: #eef6ff;
+      --muted: #9fb2cf;
+      --cyan: #64e8ff;
+      --mint: #7dffb2;
+      --gold: #ffd166;
+      --pink: #ff6eb4;
+      --red: #ff5f6d;
       --purple: #a78bfa;
-      --blue: #60a5fa;
-      --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      --radius: 22px;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
     }
 
     * { box-sizing: border-box; }
 
+    html,
     body {
+      width: 100%;
+      min-height: 100%;
       margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: linear-gradient(180deg, #eef2f7 0%, #f8fafc 100%);
+      overflow-x: hidden;
+      background: radial-gradient(circle at 20% 10%, #1c2754 0 14%, transparent 38%),
+        radial-gradient(circle at 80% 20%, rgba(120, 58, 190, 0.42) 0 10%, transparent 30%),
+        linear-gradient(160deg, #050711, #10162f 45%, #090b18);
       color: var(--text);
-      padding: 24px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
-    .wrap {
-      max-width: 1200px;
-      margin: 0 auto;
+    body {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
     }
 
-    .topbar {
+    .shell {
+      width: min(1280px, 100%);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 330px;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .game-card,
+    .side-card {
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: linear-gradient(180deg, rgba(20, 31, 64, 0.86), rgba(7, 10, 25, 0.86));
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .game-card::before,
+    .side-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(110deg, rgba(255, 255, 255, 0.10), transparent 28%, transparent 74%, rgba(100, 232, 255, 0.08));
+      mix-blend-mode: screen;
+    }
+
+    header {
       display: flex;
       justify-content: space-between;
+      gap: 16px;
       align-items: center;
-      margin-bottom: 20px;
-      gap: 12px;
-      flex-wrap: wrap;
+      padding: 18px 20px 10px;
+      position: relative;
+      z-index: 2;
     }
 
-    .topbar h1 {
-      margin: 0;
-      font-size: 28px;
-    }
-
-    .topbar p {
-      margin: 6px 0 0;
-      color: var(--muted);
-    }
-
-    .screen-picker {
+    .brand {
       display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+      gap: 14px;
+      align-items: center;
     }
 
-    .screen-picker button {
-      border: 1px solid var(--line);
-      background: white;
-      padding: 10px 14px;
-      border-radius: 999px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-
-    .screen-picker button.active {
-      background: #111827;
-      color: white;
-      border-color: #111827;
-    }
-
-    .phone-grid {
+    .logo {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      background: conic-gradient(from 140deg, var(--cyan), var(--purple), var(--pink), var(--gold), var(--cyan));
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
+      place-items: center;
+      box-shadow: 0 0 28px rgba(100, 232, 255, 0.36);
     }
 
-    .phone {
-      background: #0f172a;
-      padding: 10px;
-      border-radius: 34px;
-      box-shadow: var(--shadow);
-      display: none;
+    .logo svg { width: 38px; height: 38px; filter: drop-shadow(0 3px 8px rgba(0,0,0,.55)); }
+
+    h1 { margin: 0; font-size: clamp(24px, 3vw, 42px); letter-spacing: -0.04em; }
+    .tagline { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+
+    .top-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+
+    button {
+      color: var(--text);
+      border: 1px solid rgba(143, 197, 255, 0.32);
+      background: linear-gradient(180deg, rgba(38, 56, 111, 0.95), rgba(16, 24, 52, 0.95));
+      border-radius: 14px;
+      padding: 10px 13px;
+      font-weight: 800;
+      cursor: pointer;
+      letter-spacing: 0.01em;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 8px 20px rgba(0,0,0,.24);
+      transition: transform 0.15s ease, border-color 0.15s ease, filter 0.15s ease;
     }
 
-    .phone.active,
-    .phone.show-all {
+    button:hover { transform: translateY(-1px); border-color: rgba(100, 232, 255, 0.8); filter: brightness(1.08); }
+    button:active { transform: translateY(1px); }
+    button:disabled { cursor: not-allowed; opacity: 0.45; transform: none; }
+
+    #gameWrap { position: relative; margin: 0 20px 20px; z-index: 2; }
+
+    canvas {
+      width: 100%;
+      aspect-ratio: 16 / 9;
       display: block;
+      border-radius: 22px;
+      border: 1px solid rgba(125, 176, 255, 0.28);
+      background: #070914;
+      image-rendering: pixelated;
     }
 
-    .screen {
-      background: var(--bg);
-      min-height: 720px;
-      border-radius: 26px;
-      overflow: hidden;
+    .hud {
+      position: absolute;
+      inset: 14px 14px auto 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      pointer-events: none;
+      font-weight: 850;
+      text-shadow: 0 2px 8px #000;
+    }
+
+    .hud-left,
+    .hud-right { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .pill {
+      padding: 8px 11px;
+      border: 1px solid rgba(159, 178, 207, 0.25);
+      border-radius: 999px;
+      background: rgba(5, 8, 18, 0.58);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 6px 18px rgba(0,0,0,.24);
+      font-size: 13px;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: radial-gradient(circle at 50% 35%, rgba(27, 43, 91, 0.84), rgba(3, 5, 14, 0.92));
+      border-radius: 22px;
+      text-align: center;
+      z-index: 5;
+    }
+
+    .overlay.hidden { display: none; }
+
+    .start-panel {
+      max-width: 760px;
+      border: 1px solid rgba(125, 176, 255, 0.24);
+      border-radius: 28px;
+      padding: clamp(20px, 4vw, 38px);
+      background: rgba(8, 13, 31, 0.76);
+      box-shadow: var(--shadow);
+    }
+
+    .start-panel h2 { margin: 0 0 10px; font-size: clamp(32px, 5vw, 66px); line-height: 0.95; letter-spacing: -0.06em; }
+    .start-panel p { color: var(--muted); line-height: 1.6; margin: 10px 0; }
+    .big { font-size: 18px; }
+    .primary { background: linear-gradient(180deg, #38dfff, #1679ff); color: #06101e; border-color: #9ff4ff; font-size: 16px; }
+    .danger { background: linear-gradient(180deg, #ff7e86, #c8274c); }
+
+    .quick-help {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 20px 0;
+      text-align: left;
+    }
+
+    .help-tile {
+      padding: 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(125,176,255,.2);
+      background: rgba(255,255,255,.05);
+      min-height: 94px;
+    }
+
+    .help-tile b { display: block; color: var(--cyan); margin-bottom: 6px; }
+
+    .side-card {
+      padding: 18px;
       display: flex;
       flex-direction: column;
+      gap: 14px;
+      min-height: 650px;
     }
 
-    .status {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 18px 6px;
-      font-size: 14px;
-      font-weight: 700;
+    .panel {
+      position: relative;
+      z-index: 2;
+      padding: 15px;
+      border: 1px solid rgba(125, 176, 255, 0.20);
+      border-radius: 22px;
+      background: var(--panel);
     }
 
-    .content {
-      padding: 10px 16px 90px;
-      flex: 1;
-    }
+    .panel h2,
+    .panel h3 { margin: 0 0 10px; letter-spacing: -0.03em; }
+    .panel h2 { font-size: 22px; }
+    .panel h3 { font-size: 16px; color: #dbeaff; }
+    .panel p { margin: 7px 0; color: var(--muted); line-height: 1.45; }
 
-    .row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
+    .meters { display: grid; gap: 10px; }
+    .meter-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 5px; font-weight: 800; }
+    .bar { height: 11px; border-radius: 999px; overflow: hidden; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.09); }
+    .fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--cyan), var(--mint)); border-radius: inherit; transition: width .16s linear; }
+    .fill.red { background: linear-gradient(90deg, var(--red), var(--gold)); }
+    .fill.gold { background: linear-gradient(90deg, #83601b, var(--gold)); }
 
-    .muted { color: var(--muted); }
-    .small { font-size: 13px; }
-    .tiny { font-size: 12px; }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 16px;
-      margin-top: 14px;
-    }
-
-    .menu-icon, .bell, .icon-btn {
-      font-size: 20px;
-      background: none;
-      border: none;
-      cursor: pointer;
-    }
-
-    .hello {
-      margin-top: 10px;
-    }
-
-    .hello h2 {
-      margin: 0;
-      font-size: 20px;
-    }
-
-    .quick-moods {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin-top: 12px;
-    }
-
-    .mood {
-      text-align: center;
-      cursor: pointer;
-    }
-
-    .mood .circle {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      margin: 0 auto 8px;
-      font-size: 24px;
-      border: 3px solid transparent;
-    }
-
-    .mood.selected .circle { border-color: #111827; }
-
-    .bg-green { background: #dcfce7; }
-    .bg-yellow { background: #fef9c3; }
-    .bg-orange { background: #ffedd5; }
-    .bg-red { background: #fee2e2; }
-    .bg-blue { background: #dbeafe; }
-    .bg-purple { background: #ede9fe; }
-
-    .summary-list, .mini-stats, .insight-list, .help-list, .report-list {
-      display: grid;
-      gap: 12px;
-    }
-
-    .summary-item, .help-item, .report-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .summary-left, .help-left, .report-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .dot-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      font-size: 18px;
-    }
-
-    .quick-actions {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .action {
-      text-align: center;
-      font-size: 13px;
-    }
-
-    .action .dot-icon {
-      margin: 0 auto 8px;
-    }
-
-    .nav {
-      position: sticky;
-      bottom: 0;
-      background: rgba(255,255,255,0.95);
-      border-top: 1px solid var(--line);
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      padding: 12px 8px;
-      backdrop-filter: blur(12px);
-    }
-
-    .nav div {
-      text-align: center;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .nav .active-tab {
-      color: var(--green);
-      font-weight: 700;
-    }
-
-    .chip-row, .range-row, .context-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-
-    .chip, .range-chip, .context-chip {
-      padding: 10px 12px;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      background: white;
-      font-size: 13px;
-      cursor: pointer;
-    }
-
-    .chip.selected, .range-chip.selected, .context-chip.selected {
-      background: var(--green-soft);
-      border-color: #86efac;
-      color: #166534;
-      font-weight: 700;
-    }
-
-    textarea {
+    .upgrade-list { display: grid; gap: 10px; }
+    .upgrade {
       width: 100%;
-      min-height: 90px;
-      resize: vertical;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 14px;
-      font: inherit;
-      margin-top: 10px;
-      background: white;
-    }
-
-    .primary-btn {
-      width: 100%;
-      border: none;
-      background: var(--green);
-      color: white;
-      padding: 16px;
-      border-radius: 16px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: 16px;
-    }
-
-    .stat-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .stat-box {
-      background: white;
-      border: 1px solid var(--line);
-      border-radius: 18px;
+      grid-template-columns: 1fr auto;
+      gap: 6px 10px;
+      text-align: left;
       padding: 12px;
     }
+    .upgrade small { color: var(--muted); font-weight: 700; grid-column: 1 / -1; }
+    .cost { color: var(--gold); }
 
-    .meter {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      background: conic-gradient(var(--orange) 0 216deg, #f3f4f6 216deg 360deg);
-      display: grid;
-      place-items: center;
-      margin-left: auto;
-    }
-
-    .meter-inner {
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      background: white;
-      display: grid;
-      place-items: center;
-      text-align: center;
-      font-weight: 700;
-    }
-
-    .bar-row {
-      display: grid;
-      grid-template-columns: 1fr 120px auto;
-      gap: 10px;
-      align-items: center;
-      margin-top: 12px;
-      font-size: 13px;
-    }
-
-    .bar {
-      height: 8px;
-      border-radius: 999px;
-      background: #f3f4f6;
-      overflow: hidden;
-    }
-
-    .bar > div {
-      height: 100%;
-      border-radius: 999px;
-    }
-
-    .tabs {
-      display: flex;
-      gap: 8px;
-      margin-top: 14px;
-    }
-
-    .tabs button {
-      flex: 1;
+    .quest-list,
+    .log { display: grid; gap: 8px; }
+    .quest {
       padding: 10px;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      background: white;
-      cursor: pointer;
-      font-weight: 700;
+      border-radius: 14px;
+      background: rgba(255,255,255,.045);
+      border: 1px solid rgba(255,255,255,.08);
+      font-size: 13px;
+      color: #d9e8ff;
+    }
+    .quest.done { border-color: rgba(125,255,178,.45); color: var(--mint); }
+
+    .log {
+      max-height: 126px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+    .log-entry { color: var(--muted); font-size: 12px; line-height: 1.35; }
+    .log-entry b { color: var(--cyan); }
+
+    .sound-toggle { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
+
+    .kbd {
+      display: inline-grid;
+      place-items: center;
+      min-width: 24px;
+      height: 24px;
+      padding: 0 7px;
+      border-radius: 7px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.15);
+      color: #fff;
+      font-weight: 900;
+      font-size: 12px;
+      box-shadow: inset 0 -2px 0 rgba(0,0,0,.24);
     }
 
-    .tabs button.active {
-      background: var(--green);
-      color: white;
-      border-color: var(--green);
+    @media (max-width: 980px) {
+      body { padding: 10px; }
+      .shell { grid-template-columns: 1fr; }
+      .side-card { min-height: auto; }
+      .quick-help { grid-template-columns: repeat(2, 1fr); }
+      header { align-items: flex-start; }
+      .top-actions { width: 100%; justify-content: flex-start; }
     }
 
-    .chart {
-      margin-top: 14px;
-      background: linear-gradient(180deg, #fff7ed 0%, #ffffff 100%);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: 12px;
-    }
-
-    svg { width: 100%; height: auto; }
-
-    .two-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .check-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    @media (max-width: 700px) {
-      body { padding: 14px; }
-      .phone-grid { grid-template-columns: 1fr; }
+    @media (max-width: 560px) {
+      #gameWrap { margin: 0 10px 10px; }
+      header { padding: 14px 14px 8px; }
+      .quick-help { grid-template-columns: 1fr; }
+      .hud { position: static; margin: 8px 0 0; padding: 0; }
+      .hud-right { display: none; }
+      canvas { aspect-ratio: 4 / 3; }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="topbar">
-      <div>
-        <h1>Fatigue Observer</h1>
-        <p>Simple HTML front-end only mockup.</p>
-      </div>
-      <div class="screen-picker">
-        <button class="picker active" data-screen="all">Show All</button>
-        <button class="picker" data-screen="home">Home</button>
-        <button class="picker" data-screen="log">New Log</button>
-        <button class="picker" data-screen="summary">Summary</button>
-        <button class="picker" data-screen="trends">Trends</button>
-        <button class="picker" data-screen="insights">Insights</button>
-        <button class="picker" data-screen="report">Report</button>
-      </div>
-    </div>
-
-    <div class="phone-grid">
-      <!-- Home -->
-      <div class="phone active show-all" data-name="home">
-        <div class="screen">
-          <div class="status"><span>9:41</span><span>📶 🔋</span></div>
-          <div class="content">
-            <div class="row">
-              <button class="menu-icon">☰</button>
-              <button class="bell">🔔</button>
-            </div>
-
-            <div class="hello">
-              <h2>Good morning, Alex 👋</h2>
-              <p class="muted">How are you feeling today?</p>
-            </div>
-
-            <div class="card">
-              <div class="row">
-                <strong>Quick Log</strong>
-              </div>
-              <p class="muted tiny">Tap how you feel right now</p>
-              <div class="quick-moods" id="homeMoods">
-                <div class="mood" data-label="Good"><div class="circle bg-green">😊</div><div class="tiny">Good</div></div>
-                <div class="mood" data-label="Okay"><div class="circle bg-yellow">😐</div><div class="tiny">Okay</div></div>
-                <div class="mood selected" data-label="Tired"><div class="circle bg-orange">😟</div><div class="tiny">Tired</div></div>
-                <div class="mood" data-label="Very Tired"><div class="circle bg-red">😫</div><div class="tiny">Very Tired</div></div>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="row">
-                <strong>Today's Summary</strong>
-                <span class="tiny muted">Logged at 8:45 AM</span>
-              </div>
-              <div class="summary-list" style="margin-top:12px;">
-                <div class="summary-item">
-                  <div class="summary-left"><div class="dot-icon bg-blue">💧</div><span>Fatigue Level</span></div>
-                  <span class="muted">Tired</span>
-                </div>
-                <div class="summary-item">
-                  <div class="summary-left"><div class="dot-icon bg-purple">⚡</div><span>Energy</span></div>
-                  <span class="muted">Low</span>
-                </div>
-                <div class="summary-item">
-                  <div class="summary-left"><div class="dot-icon bg-yellow">🌙</div><span>Sleep Quality</span></div>
-                  <span class="muted">Poor</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="card">
-              <strong>Quick Actions</strong>
-              <div class="quick-actions">
-                <div class="action"><div class="dot-icon bg-green">➕</div>Log Event</div>
-                <div class="action"><div class="dot-icon bg-purple">👤</div>Symptoms</div>
-                <div class="action"><div class="dot-icon bg-blue">📈</div>Timeline</div>
-                <div class="action"><div class="dot-icon bg-yellow">💡</div>Insights</div>
-              </div>
-            </div>
+  <main class="shell">
+    <section class="game-card">
+      <header>
+        <div class="brand">
+          <div class="logo" aria-hidden="true">
+            <svg viewBox="0 0 64 64" role="img">
+              <path fill="#07101e" d="M32 3l7.7 19.1L60 24l-15.4 13.2L49.1 58 32 47 14.9 58l4.5-20.8L4 24l20.3-1.9L32 3z"/>
+              <circle cx="32" cy="32" r="10" fill="#64e8ff"/>
+              <circle cx="32" cy="32" r="4" fill="#fff9c7"/>
+            </svg>
           </div>
-          <div class="nav">
-            <div class="active-tab">🏠<br>Home</div>
-            <div>📝<br>Log</div>
-            <div>🕒<br>Timeline</div>
-            <div>📊<br>Trends</div>
-            <div>⋯<br>More</div>
+          <div>
+            <h1>Starforger: Moon Mender</h1>
+            <p class="tagline">Mine crystal moons, fight void critters, and rebuild the Beacon before the eclipse wins.</p>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button id="pauseBtn">Pause</button>
+          <button id="restartBtn" class="danger">Restart</button>
+        </div>
+      </header>
+
+      <div id="gameWrap">
+        <canvas id="game" width="1280" height="720" aria-label="Starforger game canvas"></canvas>
+        <div class="hud" aria-live="polite">
+          <div class="hud-left">
+            <span class="pill" id="scoreHud">Score 0</span>
+            <span class="pill" id="crystalHud">✦ 0</span>
+            <span class="pill" id="dayHud">Eclipse 0%</span>
+          </div>
+          <div class="hud-right">
+            <span class="pill">Move <span class="kbd">WASD</span>/<span class="kbd">←↑↓→</span></span>
+            <span class="pill">Mine <span class="kbd">Space</span></span>
+            <span class="pill">Dash <span class="kbd">Shift</span></span>
+          </div>
+        </div>
+        <div class="overlay" id="startOverlay">
+          <div class="start-panel">
+            <h2>Forge light from a broken moon.</h2>
+            <p class="big">A playful arcade adventure with homemade canvas art, procedural moonfields, quests, upgrades, drones, combo mining, and escalating night waves.</p>
+            <div class="quick-help">
+              <div class="help-tile"><b>Explore</b>Fly between colorful asteroids and collect loose stardust.</div>
+              <div class="help-tile"><b>Mine</b>Hold <span class="kbd">Space</span> near crystals. Keep mining streaks for combo points.</div>
+              <div class="help-tile"><b>Survive</b>Dodge moths, comets, and brutes as the eclipse rises.</div>
+              <div class="help-tile"><b>Rebuild</b>Spend crystals on upgrades and charge the Beacon to win.</div>
+            </div>
+            <button class="primary" id="startBtn">Launch Mission</button>
+          </div>
+        </div>
+        <div class="overlay hidden" id="endOverlay">
+          <div class="start-panel">
+            <h2 id="endTitle">Mission Complete!</h2>
+            <p id="endText" class="big"></p>
+            <button class="primary" id="playAgainBtn">Play Again</button>
           </div>
         </div>
       </div>
+    </section>
 
-      <!-- New Log -->
-      <div class="phone active show-all" data-name="log">
-        <div class="screen">
-          <div class="status"><span>9:41</span><span>📶 🔋</span></div>
-          <div class="content">
-            <div class="row">
-              <button class="icon-btn">←</button>
-              <strong>New Log</strong>
-              <button class="icon-btn">📅</button>
-            </div>
-
-            <div class="card">
-              <div class="row">
-                <strong>Today, 24 May 2025</strong>
-                <span class="chip selected">🕒 8:45 AM</span>
-              </div>
-
-              <h3 style="margin:18px 0 8px; font-size:18px;">How do you feel?</h3>
-              <div class="quick-moods" id="logMoods">
-                <div class="mood" data-label="Good"><div class="circle bg-green">😊</div><div class="tiny">Good</div></div>
-                <div class="mood" data-label="Okay"><div class="circle bg-yellow">😐</div><div class="tiny">Okay</div></div>
-                <div class="mood selected" data-label="Tired"><div class="circle bg-orange">😟</div><div class="tiny">Tired</div></div>
-                <div class="mood" data-label="Very Tired"><div class="circle bg-red">😫</div><div class="tiny">Very Tired</div></div>
-              </div>
-
-              <h3 style="margin:18px 0 8px; font-size:18px;">Select symptoms</h3>
-              <p class="muted tiny">Choose all that apply</p>
-              <div class="chip-row">
-                <div class="chip selected">Fatigue</div>
-                <div class="chip selected">Low energy</div>
-                <div class="chip">Headache</div>
-                <div class="chip">Dizziness</div>
-                <div class="chip">Weakness</div>
-                <div class="chip">Brain fog</div>
-                <div class="chip">+ More</div>
-              </div>
-
-              <h3 style="margin:18px 0 8px; font-size:18px;">Add a note</h3>
-              <textarea placeholder="Type anything that might be useful..."></textarea>
-
-              <h3 style="margin:18px 0 8px; font-size:18px;">Add context</h3>
-              <div class="context-row">
-                <div class="context-chip">Sleep</div>
-                <div class="context-chip selected">Stress</div>
-                <div class="context-chip">Activity</div>
-                <div class="context-chip">Illness</div>
-                <div class="context-chip">Other</div>
-              </div>
-
-              <button class="primary-btn" onclick="alert('Front-end only demo: log saved visually only.')">Save Log</button>
-            </div>
+    <aside class="side-card">
+      <section class="panel">
+        <h2>Ship Systems</h2>
+        <div class="meters">
+          <div>
+            <div class="meter-label"><span>Hull</span><span id="hullText">100/100</span></div>
+            <div class="bar"><div class="fill red" id="hullBar"></div></div>
           </div>
-          <div class="nav">
-            <div>🏠<br>Home</div>
-            <div class="active-tab">📝<br>Log</div>
-            <div>🕒<br>Timeline</div>
-            <div>📊<br>Trends</div>
-            <div>⋯<br>More</div>
+          <div>
+            <div class="meter-label"><span>Boost</span><span id="boostText">100%</span></div>
+            <div class="bar"><div class="fill" id="boostBar"></div></div>
+          </div>
+          <div>
+            <div class="meter-label"><span>Beacon Charge</span><span id="beaconText">0/100</span></div>
+            <div class="bar"><div class="fill gold" id="beaconBar"></div></div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <!-- Summary -->
-      <div class="phone active show-all" data-name="summary">
-        <div class="screen">
-          <div class="status"><span>9:41</span><span>📶 🔋</span></div>
-          <div class="content">
-            <div class="row">
-              <button class="icon-btn">←</button>
-              <strong>Daily Summary</strong>
-              <button class="icon-btn">📅</button>
-            </div>
-
-            <div class="card">
-              <div class="row">
-                <div>
-                  <div class="small muted">Fatigue Level</div>
-                  <div style="font-size:20px; font-weight:700; color: var(--orange); margin-top:6px;">Tired</div>
-                </div>
-                <div class="meter">
-                  <div class="meter-inner">6<br><span class="tiny muted">/10</span></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="stat-grid">
-              <div class="stat-box"><div class="tiny muted">Energy</div><div style="margin-top:8px; font-weight:700; color:var(--red);">Low</div><div class="tiny muted">3/10</div></div>
-              <div class="stat-box"><div class="tiny muted">Sleep Quality</div><div style="margin-top:8px; font-weight:700; color:var(--purple);">Poor</div><div class="tiny muted">2/10</div></div>
-              <div class="stat-box"><div class="tiny muted">Stress Level</div><div style="margin-top:8px; font-weight:700; color:var(--orange);">Medium</div><div class="tiny muted">5/10</div></div>
-            </div>
-
-            <div class="card">
-              <strong>Top Symptoms</strong>
-              <p class="tiny muted">You reported 3 symptoms</p>
-              <div class="bar-row"><span>Fatigue</span><div class="bar"><div style="width:78%; background: var(--orange);"></div></div><span style="color:var(--orange)">Severe</span></div>
-              <div class="bar-row"><span>Low energy</span><div class="bar"><div style="width:55%; background: #f59e0b;"></div></div><span style="color:#d97706">Moderate</span></div>
-              <div class="bar-row"><span>Headache</span><div class="bar"><div style="width:24%; background: var(--green);"></div></div><span style="color:var(--green)">Mild</span></div>
-            </div>
-
-            <div class="card">
-              <div class="row"><strong>Notes</strong><span>✏️</span></div>
-              <p class="muted">Felt tired after a long meeting.</p>
-            </div>
-          </div>
-          <div class="nav">
-            <div>🏠<br>Home</div>
-            <div>📝<br>Log</div>
-            <div class="active-tab">🕒<br>Timeline</div>
-            <div>📊<br>Trends</div>
-            <div>⋯<br>More</div>
-          </div>
+      <section class="panel">
+        <h3>Upgrades</h3>
+        <div class="upgrade-list">
+          <button class="upgrade" data-upgrade="drill"><span>Plasma Drill</span><span class="cost" id="drillCost">18✦</span><small>Mine faster and increase combo windows.</small></button>
+          <button class="upgrade" data-upgrade="engine"><span>Ion Engine</span><span class="cost" id="engineCost">16✦</span><small>Move and dash farther through danger.</small></button>
+          <button class="upgrade" data-upgrade="shield"><span>Moon Shield</span><span class="cost" id="shieldCost">22✦</span><small>Add max hull and repair some damage.</small></button>
+          <button class="upgrade" data-upgrade="drone"><span>Helper Drone</span><span class="cost" id="droneCost">28✦</span><small>Autonomously chips nearby crystals.</small></button>
+          <button class="upgrade primary" data-upgrade="beacon"><span>Charge Beacon</span><span class="cost">12✦</span><small>Convert crystals into victory progress.</small></button>
         </div>
-      </div>
+      </section>
 
-      <!-- Trends -->
-      <div class="phone active show-all" data-name="trends">
-        <div class="screen">
-          <div class="status"><span>9:41</span><span>📶 🔋</span></div>
-          <div class="content">
-            <div class="row">
-              <strong>Trends</strong>
-              <button class="icon-btn">📅</button>
-            </div>
+      <section class="panel">
+        <h3>Moon Quests</h3>
+        <div class="quest-list" id="questList"></div>
+      </section>
 
-            <div class="tabs">
-              <button class="active">Week</button>
-              <button>Month</button>
-              <button>3 Months</button>
-            </div>
-
-            <div class="card">
-              <div class="row"><strong>18 - 24 May 2025</strong><span class="muted">Weekly view</span></div>
-              <div class="chart">
-                <div class="tiny muted" style="margin-bottom:8px;">Fatigue Level (Daily Average)</div>
-                <svg viewBox="0 0 300 150" aria-label="fatigue chart">
-                  <line x1="20" y1="130" x2="280" y2="130" stroke="#d1d5db" stroke-width="1"/>
-                  <line x1="20" y1="20" x2="20" y2="130" stroke="#d1d5db" stroke-width="1"/>
-                  <polyline fill="none" stroke="#fb923c" stroke-width="4" points="20,110 60,70 100,78 140,52 180,74 220,66 260,45"/>
-                  <circle cx="20" cy="110" r="4" fill="#fb923c"/>
-                  <circle cx="60" cy="70" r="4" fill="#fb923c"/>
-                  <circle cx="100" cy="78" r="4" fill="#fb923c"/>
-                  <circle cx="140" cy="52" r="4" fill="#fb923c"/>
-                  <circle cx="180" cy="74" r="4" fill="#fb923c"/>
-                  <circle cx="220" cy="66" r="4" fill="#fb923c"/>
-                  <circle cx="260" cy="45" r="4" fill="#fb923c"/>
-                  <text x="20" y="145" font-size="10">Sun</text>
-                  <text x="60" y="145" font-size="10">Mon</text>
-                  <text x="100" y="145" font-size="10">Tue</text>
-                  <text x="140" y="145" font-size="10">Wed</text>
-                  <text x="180" y="145" font-size="10">Thu</text>
-                  <text x="220" y="145" font-size="10">Fri</text>
-                  <text x="260" y="145" font-size="10">Sat</text>
-                </svg>
-              </div>
-            </div>
-
-            <div class="two-col">
-              <div class="card" style="margin-top:0;">
-                <div class="tiny muted">Most tired on</div>
-                <div style="font-size:28px; color: var(--orange); font-weight:700; margin-top:8px;">Thursday</div>
-                <div class="muted">7.6 /10</div>
-              </div>
-              <div class="card" style="margin-top:0;">
-                <div class="tiny muted">Best day</div>
-                <div style="font-size:28px; color: var(--green); font-weight:700; margin-top:8px;">Sunday</div>
-                <div class="muted">4.2 /10</div>
-              </div>
-            </div>
-          </div>
-          <div class="nav">
-            <div>🏠<br>Home</div>
-            <div>📝<br>Log</div>
-            <div>🕒<br>Timeline</div>
-            <div class="active-tab">📊<br>Trends</div>
-            <div>⋯<br>More</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Insights -->
-      <div class="phone active show-all" data-name="insights">
-        <div class="screen">
-          <div class="status"><span>9:41</span><span>📶 🔋</span></div>
-          <div class="content">
-            <div class="row">
-              <button class="icon-btn">←</button>
-              <strong>Insights</strong>
-              <button class="icon-btn">ⓘ</button>
-            </div>
-
-            <div class="card">
-              <strong>Your patterns</strong>
-              <div class="insight-list" style="margin-top:14px;">
-                <div class="help-item"><div class="help-left"><div class="dot-icon bg-green">📅</div><span>You tend to feel more tired on Thursdays.</span></div></div>
-                <div class="help-item"><div class="help-left"><div class="dot-icon bg-purple">🌙</div><span>Poor sleep days are linked to higher fatigue.</span></div></div>
-                <div class="help-item"><div class="help-left"><div class="dot-icon bg-yellow">⚡</div><span>Lower stress days show better energy.</span></div></div>
-              </div>
-            </div>
-
-            <div class="card">
-              <strong>What can help?</strong>
-              <div class="help-list" style="margin-top:14px;">
-                <div class="help-item"><div class="help-left"><div class="dot-icon bg-purple">🛏️</div><span>Try to get 7–8 hours of sleep.</span></div></div>
-                <div class="help-item"><div class="help-left"><div class="dot-icon bg-yellow">☕</div><span>Take short breaks during long meetings.</span></div></div>
-                <div class="help-item"><div class="help-left"><div class="dot-icon bg-green">🚶</div><span>Light exercise improves energy.</span></div></div>
-              </div>
-            </div>
-          </div>
-          <div class="nav">
-            <div>🏠<br>Home</div>
-            <div>📝<br>Log</div>
-            <div>🕒<br>Timeline</div>
-            <div class="active-tab">📊<br>Trends</div>
-            <div>⋯<br>More</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Report -->
-      <div class="phone active show-all" data-name="report">
-        <div class="screen">
-          <div class="status"><span>9:41</span><span>📶 🔋</span></div>
-          <div class="content">
-            <div class="row">
-              <button class="icon-btn">←</button>
-              <strong>Export Report</strong>
-              <button class="icon-btn">⋯</button>
-            </div>
-
-            <div class="card report-item">
-              <div class="report-left">
-                <div class="dot-icon bg-green">📄</div>
-                <div>
-                  <strong>Generate a summary</strong>
-                  <div class="tiny muted">For your doctor or records</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="card">
-              <strong>Select data range</strong>
-              <div class="range-row">
-                <div class="range-chip">7 Days</div>
-                <div class="range-chip selected">30 Days</div>
-                <div class="range-chip">3 Months</div>
-                <div class="range-chip">Custom</div>
-              </div>
-            </div>
-
-            <div class="card">
-              <strong>Include in report</strong>
-              <div class="check-row"><input type="checkbox" checked> <span>Fatigue levels</span></div>
-              <div class="check-row"><input type="checkbox" checked> <span>Symptoms</span></div>
-              <div class="check-row"><input type="checkbox" checked> <span>Notes</span></div>
-              <div class="check-row"><input type="checkbox" checked> <span>Trends & insights</span></div>
-              <button class="primary-btn" onclick="alert('Front-end only demo: report generation is not connected yet.')">Generate Report</button>
-            </div>
-          </div>
-          <div class="nav">
-            <div>🏠<br>Home</div>
-            <div>📝<br>Log</div>
-            <div>🕒<br>Timeline</div>
-            <div>📊<br>Trends</div>
-            <div class="active-tab">⋯<br>More</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+      <section class="panel">
+        <h3>Captain's Log</h3>
+        <div class="log" id="log"></div>
+      </section>
+    </aside>
+  </main>
 
   <script>
-    // Show selected screen or all screens.
-    const pickerButtons = document.querySelectorAll('.picker');
-    const phones = document.querySelectorAll('.phone');
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width;
+    const H = canvas.height;
 
-    pickerButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        pickerButtons.forEach(b => b.classList.remove('active'));
-        button.classList.add('active');
+    const ui = {
+      scoreHud: document.getElementById('scoreHud'),
+      crystalHud: document.getElementById('crystalHud'),
+      dayHud: document.getElementById('dayHud'),
+      hullText: document.getElementById('hullText'),
+      hullBar: document.getElementById('hullBar'),
+      boostText: document.getElementById('boostText'),
+      boostBar: document.getElementById('boostBar'),
+      beaconText: document.getElementById('beaconText'),
+      beaconBar: document.getElementById('beaconBar'),
+      questList: document.getElementById('questList'),
+      log: document.getElementById('log'),
+      startOverlay: document.getElementById('startOverlay'),
+      endOverlay: document.getElementById('endOverlay'),
+      endTitle: document.getElementById('endTitle'),
+      endText: document.getElementById('endText'),
+      startBtn: document.getElementById('startBtn'),
+      pauseBtn: document.getElementById('pauseBtn'),
+      restartBtn: document.getElementById('restartBtn'),
+      playAgainBtn: document.getElementById('playAgainBtn'),
+      costs: {
+        drill: document.getElementById('drillCost'),
+        engine: document.getElementById('engineCost'),
+        shield: document.getElementById('shieldCost'),
+        drone: document.getElementById('droneCost')
+      }
+    };
 
-        const target = button.dataset.screen;
-        phones.forEach(phone => {
-          phone.classList.remove('active', 'show-all');
+    const keys = new Set();
+    const pointer = { x: W / 2, y: H / 2, down: false };
+    let raf = 0;
+    let last = performance.now();
 
-          if (target === 'all') {
-            phone.classList.add('active', 'show-all');
-          } else if (phone.dataset.name === target) {
-            phone.classList.add('active');
-          }
-        });
-      });
-    });
+    const rand = (min, max) => Math.random() * (max - min) + min;
+    const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+    const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 
-    // Simple mood selection behaviour.
-    function setupMoodGroup(containerId) {
-      const container = document.getElementById(containerId);
-      if (!container) return;
-      const moods = container.querySelectorAll('.mood');
-      moods.forEach(mood => {
-        mood.addEventListener('click', () => {
-          moods.forEach(m => m.classList.remove('selected'));
-          mood.classList.add('selected');
-        });
+    const game = {
+      running: false,
+      paused: false,
+      over: false,
+      time: 0,
+      score: 0,
+      crystals: 0,
+      mined: 0,
+      combo: 1,
+      comboTimer: 0,
+      beacon: 0,
+      eclipse: 0,
+      shake: 0,
+      spawnTimer: 0,
+      cometTimer: 7,
+      stars: [],
+      asteroids: [],
+      pickups: [],
+      enemies: [],
+      particles: [],
+      drones: [],
+      logs: [],
+      upgrades: { drill: 1, engine: 1, shield: 1, drone: 0 },
+      player: null,
+      quests: []
+    };
+
+    function makePlayer() {
+      return {
+        x: W / 2,
+        y: H / 2,
+        vx: 0,
+        vy: 0,
+        r: 18,
+        angle: 0,
+        hull: 100,
+        maxHull: 100,
+        boost: 100,
+        invuln: 0,
+        mineBeam: 0
+      };
+    }
+
+    function addLog(text) {
+      game.logs.unshift(`<b>${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</b> ${text}`);
+      game.logs = game.logs.slice(0, 9);
+      ui.log.innerHTML = game.logs.map(line => `<div class="log-entry">${line}</div>`).join('');
+    }
+
+    function resetGame() {
+      game.running = false;
+      game.paused = false;
+      game.over = false;
+      game.time = 0;
+      game.score = 0;
+      game.crystals = 0;
+      game.mined = 0;
+      game.combo = 1;
+      game.comboTimer = 0;
+      game.beacon = 0;
+      game.eclipse = 0;
+      game.shake = 0;
+      game.spawnTimer = 1;
+      game.cometTimer = 6;
+      game.asteroids = [];
+      game.pickups = [];
+      game.enemies = [];
+      game.particles = [];
+      game.drones = [];
+      game.upgrades = { drill: 1, engine: 1, shield: 1, drone: 0 };
+      game.player = makePlayer();
+      game.logs = [];
+      game.quests = [
+        { id: 'first', label: 'Mine 8 crystals', done: false, check: () => game.mined >= 8, reward: () => rewardQuest(18, 'First vein sealed! Bonus crystals added.') },
+        { id: 'hunter', label: 'Defeat 12 void critters', done: false, check: () => game.score >= 1200, reward: () => rewardQuest(16, 'Void pressure falling. Keep flying!') },
+        { id: 'engineer', label: 'Buy any 3 upgrades', done: false, check: () => Object.values(game.upgrades).reduce((a, b) => a + b, 0) >= 7, reward: () => rewardQuest(22, 'Engineering bay sings with new power.') },
+        { id: 'savior', label: 'Charge the Beacon to 100', done: false, check: () => game.beacon >= 100, reward: () => winGame() }
+      ];
+      generateField();
+      renderQuests();
+      addLog('Mission reset. The moon hums with sleepy crystal weather.');
+      ui.pauseBtn.textContent = 'Pause';
+      ui.startOverlay.classList.remove('hidden');
+      ui.endOverlay.classList.add('hidden');
+      updateUI();
+    }
+
+    function rewardQuest(amount, text) {
+      game.crystals += amount;
+      burst(game.player.x, game.player.y, amount, '#ffd166');
+      addLog(text);
+    }
+
+    function generateField() {
+      game.stars = Array.from({ length: 170 }, () => ({ x: rand(0, W), y: rand(0, H), z: rand(0.2, 1), tw: rand(0, 6.28) }));
+      for (let i = 0; i < 34; i++) spawnAsteroid(true);
+      for (let i = 0; i < 12; i++) spawnPickup(rand(30, W - 30), rand(40, H - 40), 1);
+    }
+
+    function spawnAsteroid(initial = false) {
+      let a;
+      do {
+        a = {
+          x: rand(50, W - 50),
+          y: rand(70, H - 50),
+          r: rand(18, 44),
+          hp: 0,
+          maxHp: 0,
+          spin: rand(-1, 1),
+          rot: rand(0, 6.28),
+          hue: Math.random() < 0.5 ? '#64e8ff' : Math.random() < 0.5 ? '#a78bfa' : '#7dffb2',
+          rare: Math.random() < 0.14,
+          verts: []
+        };
+      } while (dist(a, game.player) < 130);
+      a.maxHp = Math.round(a.r * (a.rare ? 3.3 : 2.0));
+      a.hp = a.maxHp;
+      const points = Math.floor(rand(8, 13));
+      for (let i = 0; i < points; i++) a.verts.push(rand(0.72, 1.2));
+      if (initial || game.asteroids.length < 46) game.asteroids.push(a);
+    }
+
+    function spawnPickup(x, y, value = 1) {
+      game.pickups.push({ x, y, value, r: value > 1 ? 12 : 8, t: rand(0, 8) });
+    }
+
+    function spawnEnemy() {
+      const side = Math.floor(rand(0, 4));
+      const p = [
+        { x: -30, y: rand(0, H) },
+        { x: W + 30, y: rand(0, H) },
+        { x: rand(0, W), y: -30 },
+        { x: rand(0, W), y: H + 30 }
+      ][side];
+      const brutal = game.eclipse > 65 && Math.random() < 0.22;
+      game.enemies.push({
+        ...p,
+        r: brutal ? 26 : 15,
+        hp: brutal ? 7 : 3,
+        speed: brutal ? rand(45, 70) : rand(75, 118) + game.eclipse * 0.4,
+        type: brutal ? 'brute' : (Math.random() < 0.22 ? 'spitter' : 'moth'),
+        hit: 0,
+        shoot: rand(1, 4),
+        vx: 0,
+        vy: 0
       });
     }
 
-    setupMoodGroup('homeMoods');
-    setupMoodGroup('logMoods');
+    function burst(x, y, count, color, force = 1) {
+      for (let i = 0; i < count; i++) {
+        const a = rand(0, Math.PI * 2);
+        const s = rand(30, 220) * force;
+        game.particles.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: rand(0.35, 0.9), max: 1, color, r: rand(1.5, 4) });
+      }
+    }
 
-    // Toggle chips.
-    document.querySelectorAll('.chip, .context-chip, .range-chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        if (chip.classList.contains('range-chip')) {
-          chip.parentElement.querySelectorAll('.range-chip').forEach(c => c.classList.remove('selected'));
-          chip.classList.add('selected');
-        } else {
-          chip.classList.toggle('selected');
+    function startGame() {
+      ui.startOverlay.classList.add('hidden');
+      ui.endOverlay.classList.add('hidden');
+      game.running = true;
+      game.paused = false;
+      last = performance.now();
+      addLog('Launch confirmed. Find crystal seams and wake the Beacon.');
+    }
+
+    function endGame(title, text) {
+      game.over = true;
+      game.running = false;
+      ui.endTitle.textContent = title;
+      ui.endText.textContent = text;
+      ui.endOverlay.classList.remove('hidden');
+    }
+
+    function winGame() {
+      if (game.over) return;
+      game.score += 5000;
+      burst(W / 2, H / 2, 140, '#ffd166', 1.8);
+      endGame('Beacon Restored!', `You saved the moon with ${game.score.toLocaleString()} points, ${game.mined} mined crystals, and eclipse at ${Math.round(game.eclipse)}%.`);
+    }
+
+    function loseGame() {
+      endGame('Hull Breached', `The eclipse swallowed the workshop. Final score: ${game.score.toLocaleString()}. Try a faster upgrade path!`);
+    }
+
+    function update(dt) {
+      if (!game.running || game.paused || game.over) return;
+      const p = game.player;
+      game.time += dt;
+      game.eclipse = clamp(game.time * 0.82 + game.beacon * 0.07, 0, 100);
+      game.spawnTimer -= dt;
+      game.cometTimer -= dt;
+      game.comboTimer -= dt;
+      game.shake = Math.max(0, game.shake - dt * 22);
+      if (game.comboTimer <= 0) game.combo = 1;
+
+      const ax = (keys.has('d') || keys.has('arrowright') ? 1 : 0) - (keys.has('a') || keys.has('arrowleft') ? 1 : 0);
+      const ay = (keys.has('s') || keys.has('arrowdown') ? 1 : 0) - (keys.has('w') || keys.has('arrowup') ? 1 : 0);
+      const mag = Math.hypot(ax, ay) || 1;
+      const engine = game.upgrades.engine;
+      const thrust = 600 + engine * 70;
+      p.vx += (ax / mag) * thrust * dt;
+      p.vy += (ay / mag) * thrust * dt;
+      const wantsDash = keys.has('shift');
+      if (wantsDash && p.boost > 28 && (ax || ay)) {
+        p.vx += (ax / mag) * (660 + engine * 90) * dt * 4;
+        p.vy += (ay / mag) * (660 + engine * 90) * dt * 4;
+        p.boost -= 55 * dt;
+        burst(p.x - ax * 12, p.y - ay * 12, 2, '#64e8ff');
+      }
+      p.boost = clamp(p.boost + (wantsDash ? -10 : 20 + engine * 2) * dt, 0, 100);
+      p.vx *= Math.pow(0.025, dt);
+      p.vy *= Math.pow(0.025, dt);
+      p.x = clamp(p.x + p.vx * dt, p.r, W - p.r);
+      p.y = clamp(p.y + p.vy * dt, p.r + 15, H - p.r);
+      p.angle = Math.atan2(p.vy, p.vx);
+      p.invuln = Math.max(0, p.invuln - dt);
+
+      handleMining(dt);
+      updateDrones(dt);
+      updatePickups(dt);
+      updateEnemies(dt);
+      updateParticles(dt);
+      checkQuests();
+
+      if (game.spawnTimer <= 0) {
+        spawnEnemy();
+        game.spawnTimer = Math.max(0.42, 2.15 - game.eclipse / 55 - game.time / 180);
+      }
+      if (game.cometTimer <= 0) {
+        launchComet();
+        game.cometTimer = rand(6, 11) - game.eclipse / 35;
+      }
+      while (game.asteroids.length < 28) spawnAsteroid();
+      if (game.eclipse >= 100 && game.beacon < 100) loseGame();
+      updateUI();
+    }
+
+    function handleMining(dt) {
+      const p = game.player;
+      const mining = keys.has(' ') || pointer.down;
+      p.mineBeam = mining ? Math.min(1, p.mineBeam + dt * 8) : Math.max(0, p.mineBeam - dt * 8);
+      if (!mining) return;
+      let target = null;
+      let best = Infinity;
+      for (const a of game.asteroids) {
+        const d = dist(p, a) - a.r;
+        if (d < 78 && d < best) { best = d; target = a; }
+      }
+      if (!target) return;
+      const damage = (28 + game.upgrades.drill * 15) * dt;
+      target.hp -= damage;
+      target.rot += target.spin * dt * 2;
+      game.comboTimer = 2.4 + game.upgrades.drill * 0.22;
+      if (Math.random() < 0.42) burst(target.x + rand(-target.r, target.r), target.y + rand(-target.r, target.r), 1, target.hue);
+      if (target.hp <= 0) {
+        const value = Math.ceil(target.r / 9) + (target.rare ? 8 : 0);
+        game.asteroids.splice(game.asteroids.indexOf(target), 1);
+        game.crystals += value;
+        game.mined += value;
+        game.score += Math.round(value * 80 * game.combo);
+        game.combo = clamp(game.combo + 0.18, 1, 5);
+        addLog(`Cracked a ${target.rare ? 'rare ' : ''}seam for ${value} crystals. Combo x${game.combo.toFixed(1)}.`);
+        burst(target.x, target.y, 24, target.hue, 1.2);
+        for (let i = 0; i < value; i++) spawnPickup(target.x + rand(-18, 18), target.y + rand(-18, 18), Math.random() < 0.16 ? 2 : 1);
+      }
+    }
+
+    function updateDrones(dt) {
+      game.drones.forEach((d, i) => {
+        const angle = game.time * 1.3 + i * Math.PI * 2 / Math.max(1, game.drones.length);
+        d.x = game.player.x + Math.cos(angle) * 54;
+        d.y = game.player.y + Math.sin(angle) * 54;
+        d.cool -= dt;
+        if (d.cool <= 0) {
+          const target = game.asteroids.find(a => Math.hypot(a.x - d.x, a.y - d.y) < 115);
+          if (target) {
+            target.hp -= 8 + game.upgrades.drill * 4;
+            burst(target.x, target.y, 2, '#7dffb2');
+            if (target.hp <= 0) {
+              game.crystals += 2;
+              game.mined += 2;
+              game.score += 130;
+              game.asteroids.splice(game.asteroids.indexOf(target), 1);
+            }
+          }
+          d.cool = 0.45;
         }
       });
+    }
+
+    function updatePickups(dt) {
+      for (let i = game.pickups.length - 1; i >= 0; i--) {
+        const c = game.pickups[i];
+        c.t += dt;
+        const d = dist(c, game.player);
+        if (d < 140) {
+          c.x += (game.player.x - c.x) * dt * 4.5;
+          c.y += (game.player.y - c.y) * dt * 4.5;
+        }
+        if (d < game.player.r + c.r) {
+          game.crystals += c.value;
+          game.score += 35 * c.value;
+          game.pickups.splice(i, 1);
+        }
+      }
+    }
+
+    function updateEnemies(dt) {
+      const p = game.player;
+      for (let i = game.enemies.length - 1; i >= 0; i--) {
+        const e = game.enemies[i];
+        e.hit = Math.max(0, e.hit - dt);
+        const dx = p.x - e.x;
+        const dy = p.y - e.y;
+        const d = Math.hypot(dx, dy) || 1;
+        if (e.type === 'spitter' && d < 260) {
+          e.vx += (-dy / d) * e.speed * 0.7 * dt;
+          e.vy += (dx / d) * e.speed * 0.7 * dt;
+          e.shoot -= dt;
+          if (e.shoot <= 0) {
+            game.particles.push({ x: e.x, y: e.y, vx: dx / d * 230, vy: dy / d * 230, life: 2.2, max: 2.2, color: '#ff6eb4', r: 7, hostile: true });
+            e.shoot = rand(2, 3.5);
+          }
+        } else {
+          e.vx += (dx / d) * e.speed * dt;
+          e.vy += (dy / d) * e.speed * dt;
+        }
+        e.vx *= Math.pow(0.08, dt);
+        e.vy *= Math.pow(0.08, dt);
+        e.x += e.vx * dt;
+        e.y += e.vy * dt;
+        if (d < p.r + e.r && p.invuln <= 0) damagePlayer(e.type === 'brute' ? 24 : 13);
+        if ((keys.has(' ') || pointer.down) && d < 92 + game.upgrades.drill * 8) {
+          e.hp -= dt * (2 + game.upgrades.drill * 0.8);
+          e.hit = 0.1;
+        }
+        if (e.hp <= 0) {
+          game.score += e.type === 'brute' ? 420 : 165;
+          if (Math.random() < 0.65) spawnPickup(e.x, e.y, e.type === 'brute' ? 3 : 1);
+          burst(e.x, e.y, e.type === 'brute' ? 32 : 14, '#ff6eb4', 1.1);
+          game.enemies.splice(i, 1);
+        }
+      }
+    }
+
+    function updateParticles(dt) {
+      for (let i = game.particles.length - 1; i >= 0; i--) {
+        const p = game.particles[i];
+        p.life -= dt;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vx *= Math.pow(0.22, dt);
+        p.vy *= Math.pow(0.22, dt);
+        if (p.hostile && dist(p, game.player) < game.player.r + p.r && game.player.invuln <= 0) {
+          damagePlayer(10);
+          p.life = 0;
+        }
+        if (p.life <= 0) game.particles.splice(i, 1);
+      }
+    }
+
+    function damagePlayer(amount) {
+      const p = game.player;
+      p.hull -= amount;
+      p.invuln = 1.0;
+      game.shake = 13;
+      burst(p.x, p.y, 24, '#ff5f6d', 1.4);
+      addLog(`Hull took ${amount} damage. Keep moving!`);
+      if (p.hull <= 0) loseGame();
+    }
+
+    function launchComet() {
+      const y = rand(80, H - 80);
+      game.particles.push({ x: -50, y, vx: rand(500, 660), vy: rand(-60, 60), life: 3.2, max: 3.2, color: '#ffd166', r: 14, hostile: true, comet: true });
+      addLog('Solar comet crossing! Dash away from the gold flare.');
+    }
+
+    function checkQuests() {
+      let changed = false;
+      game.quests.forEach(q => {
+        if (!q.done && q.check()) {
+          q.done = true;
+          changed = true;
+          q.reward();
+        }
+      });
+      if (changed) renderQuests();
+    }
+
+    function buyUpgrade(type) {
+      if (!game.player || game.over) return;
+      const costs = {
+        drill: 18 + (game.upgrades.drill - 1) * 20,
+        engine: 16 + (game.upgrades.engine - 1) * 18,
+        shield: 22 + (game.upgrades.shield - 1) * 24,
+        drone: 28 + game.upgrades.drone * 34,
+        beacon: 12
+      };
+      const cost = costs[type];
+      if (game.crystals < cost) {
+        addLog(`Need ${cost - game.crystals} more crystals for ${type}.`);
+        return;
+      }
+      game.crystals -= cost;
+      if (type === 'beacon') {
+        game.beacon = clamp(game.beacon + 12, 0, 100);
+        game.score += 320;
+        burst(W / 2, H / 2, 38, '#ffd166', 1.3);
+        addLog('Beacon charged. The moon brightens.');
+      } else if (type === 'shield') {
+        game.upgrades.shield++;
+        game.player.maxHull += 18;
+        game.player.hull = clamp(game.player.hull + 34, 0, game.player.maxHull);
+        addLog('Moon Shield reinforced and hull repaired.');
+      } else if (type === 'drone') {
+        game.upgrades.drone++;
+        game.drones.push({ x: game.player.x, y: game.player.y, cool: 0 });
+        addLog('Helper Drone deployed. It chirps bravely.');
+      } else {
+        game.upgrades[type]++;
+        addLog(`${type === 'drill' ? 'Plasma Drill' : 'Ion Engine'} upgraded to level ${game.upgrades[type]}.`);
+      }
+      updateUI();
+      checkQuests();
+    }
+
+    function updateUI() {
+      const p = game.player;
+      ui.scoreHud.textContent = `Score ${game.score.toLocaleString()}`;
+      ui.crystalHud.textContent = `✦ ${game.crystals}`;
+      ui.dayHud.textContent = `Eclipse ${Math.round(game.eclipse)}%`;
+      ui.hullText.textContent = `${Math.max(0, Math.round(p.hull))}/${p.maxHull}`;
+      ui.hullBar.style.width = `${clamp(p.hull / p.maxHull * 100, 0, 100)}%`;
+      ui.boostText.textContent = `${Math.round(p.boost)}%`;
+      ui.boostBar.style.width = `${p.boost}%`;
+      ui.beaconText.textContent = `${Math.round(game.beacon)}/100`;
+      ui.beaconBar.style.width = `${game.beacon}%`;
+      ui.costs.drill.textContent = `${18 + (game.upgrades.drill - 1) * 20}✦`;
+      ui.costs.engine.textContent = `${16 + (game.upgrades.engine - 1) * 18}✦`;
+      ui.costs.shield.textContent = `${22 + (game.upgrades.shield - 1) * 24}✦`;
+      ui.costs.drone.textContent = `${28 + game.upgrades.drone * 34}✦`;
+    }
+
+    function renderQuests() {
+      ui.questList.innerHTML = game.quests.map(q => `<div class="quest ${q.done ? 'done' : ''}">${q.done ? '✓' : '◇'} ${q.label}</div>`).join('');
+    }
+
+    function draw() {
+      ctx.save();
+      const sx = rand(-game.shake, game.shake);
+      const sy = rand(-game.shake, game.shake);
+      ctx.translate(sx, sy);
+      drawSpace();
+      drawBeacon();
+      game.asteroids.forEach(drawAsteroid);
+      game.pickups.forEach(drawPickup);
+      game.drones.forEach(drawDrone);
+      game.enemies.forEach(drawEnemy);
+      drawParticles();
+      drawPlayer();
+      drawVignette();
+      ctx.restore();
+    }
+
+    function drawSpace() {
+      const grd = ctx.createLinearGradient(0, 0, W, H);
+      grd.addColorStop(0, '#070914');
+      grd.addColorStop(0.52, '#121a3b');
+      grd.addColorStop(1, '#080a16');
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalAlpha = 0.25;
+      ctx.fillStyle = '#6c54ff';
+      ctx.beginPath();
+      ctx.ellipse(920, 120, 350, 110, -0.25, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      game.stars.forEach(s => {
+        const pulse = 0.55 + Math.sin(game.time * 1.8 + s.tw) * 0.45;
+        ctx.fillStyle = `rgba(210, 237, 255, ${0.25 + s.z * pulse})`;
+        ctx.fillRect(s.x, s.y, 1.2 + s.z * 2, 1.2 + s.z * 2);
+      });
+    }
+
+    function drawBeacon() {
+      ctx.save();
+      ctx.translate(W / 2, H / 2);
+      const pulse = 0.8 + Math.sin(game.time * 3) * 0.12 + game.beacon / 160;
+      const glow = ctx.createRadialGradient(0, 0, 20, 0, 0, 130 + game.beacon * 1.4);
+      glow.addColorStop(0, `rgba(255, 209, 102, ${0.15 + game.beacon / 210})`);
+      glow.addColorStop(1, 'rgba(255, 209, 102, 0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(0, 0, 160 + game.beacon, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.rotate(game.time * 0.25);
+      for (let i = 0; i < 6; i++) {
+        ctx.rotate(Math.PI / 3);
+        ctx.fillStyle = i % 2 ? 'rgba(100,232,255,.16)' : 'rgba(255,209,102,.16)';
+        ctx.fillRect(24, -4, 64 * pulse, 8);
+      }
+      ctx.strokeStyle = '#ffd166';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.arc(0, 0, 28 + game.beacon / 12, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.fillStyle = '#fff7ce';
+      ctx.beginPath();
+      ctx.arc(0, 0, 10 + game.beacon / 18, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawAsteroid(a) {
+      ctx.save();
+      ctx.translate(a.x, a.y);
+      ctx.rotate(a.rot);
+      ctx.beginPath();
+      a.verts.forEach((v, i) => {
+        const ang = i / a.verts.length * Math.PI * 2;
+        const rr = a.r * v;
+        const x = Math.cos(ang) * rr;
+        const y = Math.sin(ang) * rr;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.closePath();
+      ctx.fillStyle = a.rare ? '#2b2551' : '#202b45';
+      ctx.strokeStyle = a.hue;
+      ctx.lineWidth = a.rare ? 4 : 2;
+      ctx.shadowColor = a.hue;
+      ctx.shadowBlur = a.rare ? 20 : 8;
+      ctx.fill();
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      ctx.globalAlpha = 0.7;
+      ctx.strokeStyle = 'rgba(255,255,255,.35)';
+      ctx.beginPath();
+      ctx.moveTo(-a.r * 0.3, -a.r * 0.45);
+      ctx.lineTo(a.r * 0.25, a.r * 0.05);
+      ctx.lineTo(-a.r * 0.1, a.r * 0.5);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+      if (a.hp < a.maxHp) {
+        ctx.fillStyle = 'rgba(0,0,0,.35)';
+        ctx.fillRect(-a.r, a.r + 8, a.r * 2, 5);
+        ctx.fillStyle = a.hue;
+        ctx.fillRect(-a.r, a.r + 8, a.r * 2 * (a.hp / a.maxHp), 5);
+      }
+      ctx.restore();
+    }
+
+    function drawPickup(c) {
+      ctx.save();
+      ctx.translate(c.x, c.y + Math.sin(c.t * 5) * 3);
+      ctx.rotate(c.t * 2);
+      ctx.fillStyle = c.value > 1 ? '#ffd166' : '#64e8ff';
+      ctx.shadowColor = ctx.fillStyle;
+      ctx.shadowBlur = 15;
+      ctx.beginPath();
+      ctx.moveTo(0, -c.r);
+      ctx.lineTo(c.r * 0.72, 0);
+      ctx.lineTo(0, c.r);
+      ctx.lineTo(-c.r * 0.72, 0);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawPlayer() {
+      const p = game.player;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(Number.isFinite(p.angle) ? p.angle : 0);
+      if (p.mineBeam > 0) {
+        ctx.rotate(-p.angle);
+        const target = game.asteroids.reduce((best, a) => dist(p, a) < (best ? dist(p, best) : 999) ? a : best, null);
+        if (target && dist(p, target) - target.r < 90) {
+          ctx.strokeStyle = `rgba(100, 232, 255, ${p.mineBeam * 0.65})`;
+          ctx.lineWidth = 7 + Math.sin(game.time * 18) * 2;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(target.x - p.x, target.y - p.y);
+          ctx.stroke();
+        }
+        ctx.rotate(p.angle);
+      }
+      ctx.globalAlpha = p.invuln > 0 ? 0.55 + Math.sin(game.time * 40) * 0.25 : 1;
+      ctx.fillStyle = '#64e8ff';
+      ctx.shadowColor = '#64e8ff';
+      ctx.shadowBlur = 18;
+      ctx.beginPath();
+      ctx.moveTo(25, 0);
+      ctx.lineTo(-15, -15);
+      ctx.lineTo(-8, 0);
+      ctx.lineTo(-15, 15);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(3, 0, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ff6eb4';
+      ctx.beginPath();
+      ctx.moveTo(-16, -8);
+      ctx.lineTo(-31 - Math.random() * 10, 0);
+      ctx.lineTo(-16, 8);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawDrone(d) {
+      ctx.save();
+      ctx.translate(d.x, d.y);
+      ctx.rotate(game.time * 4);
+      ctx.fillStyle = '#7dffb2';
+      ctx.shadowColor = '#7dffb2';
+      ctx.shadowBlur = 12;
+      ctx.fillRect(-7, -7, 14, 14);
+      ctx.strokeStyle = '#fff';
+      ctx.strokeRect(-11, -11, 22, 22);
+      ctx.restore();
+    }
+
+    function drawEnemy(e) {
+      ctx.save();
+      ctx.translate(e.x, e.y);
+      const wobble = Math.sin(game.time * 8 + e.x) * 0.15;
+      ctx.rotate(Math.atan2(game.player.y - e.y, game.player.x - e.x) + wobble);
+      ctx.fillStyle = e.type === 'brute' ? '#ff5f6d' : e.type === 'spitter' ? '#ff6eb4' : '#a78bfa';
+      ctx.shadowColor = ctx.fillStyle;
+      ctx.shadowBlur = e.hit ? 24 : 10;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, e.r * 1.15, e.r * 0.75, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#070914';
+      ctx.beginPath();
+      ctx.arc(e.r * 0.38, -e.r * 0.18, 3.2, 0, Math.PI * 2);
+      ctx.arc(e.r * 0.38, e.r * 0.18, 3.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,.45)';
+      ctx.beginPath();
+      ctx.moveTo(-e.r * 0.2, -e.r * 0.6);
+      ctx.quadraticCurveTo(-e.r * 0.95, -e.r * 1.2, -e.r * 1.35, -e.r * 0.2);
+      ctx.moveTo(-e.r * 0.2, e.r * 0.6);
+      ctx.quadraticCurveTo(-e.r * 0.95, e.r * 1.2, -e.r * 1.35, e.r * 0.2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawParticles() {
+      game.particles.forEach(p => {
+        const alpha = clamp(p.life / (p.max || 1), 0, 1);
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = p.comet ? 24 : 8;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * (p.comet ? 1.4 : 1), 0, Math.PI * 2);
+        ctx.fill();
+        if (p.comet) {
+          ctx.strokeStyle = p.color;
+          ctx.lineWidth = 7;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p.x - 80, p.y - p.vy * 0.05);
+          ctx.stroke();
+        }
+        ctx.restore();
+      });
+    }
+
+    function drawVignette() {
+      const eclipseAlpha = game.eclipse / 180;
+      const grd = ctx.createRadialGradient(W / 2, H / 2, 120, W / 2, H / 2, W * 0.68);
+      grd.addColorStop(0, 'rgba(0,0,0,0)');
+      grd.addColorStop(1, `rgba(0,0,0,${0.45 + eclipseAlpha})`);
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, W, H);
+      if (game.combo > 1) {
+        ctx.fillStyle = 'rgba(255, 209, 102, 0.9)';
+        ctx.font = '900 28px system-ui';
+        ctx.textAlign = 'center';
+        ctx.fillText(`COMBO x${game.combo.toFixed(1)}`, W / 2, 84);
+      }
+      if (game.paused) {
+        ctx.fillStyle = 'rgba(0,0,0,.55)';
+        ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = '#fff';
+        ctx.font = '900 58px system-ui';
+        ctx.textAlign = 'center';
+        ctx.fillText('PAUSED', W / 2, H / 2);
+      }
+    }
+
+    function loop(now) {
+      const dt = Math.min(0.033, (now - last) / 1000);
+      last = now;
+      update(dt);
+      draw();
+      raf = requestAnimationFrame(loop);
+    }
+
+    window.addEventListener('keydown', e => {
+      const key = e.key.toLowerCase();
+      if ([' ', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) e.preventDefault();
+      if (key === 'p') togglePause();
+      keys.add(key);
     });
+    window.addEventListener('keyup', e => keys.delete(e.key.toLowerCase()));
+
+    canvas.addEventListener('pointerdown', e => { pointer.down = true; canvas.setPointerCapture(e.pointerId); });
+    canvas.addEventListener('pointerup', () => { pointer.down = false; });
+    canvas.addEventListener('pointermove', e => {
+      const rect = canvas.getBoundingClientRect();
+      pointer.x = (e.clientX - rect.left) / rect.width * W;
+      pointer.y = (e.clientY - rect.top) / rect.height * H;
+    });
+
+    function togglePause() {
+      if (!game.running || game.over) return;
+      game.paused = !game.paused;
+      ui.pauseBtn.textContent = game.paused ? 'Resume' : 'Pause';
+      addLog(game.paused ? 'Autopilot holding position.' : 'Manual control restored.');
+    }
+
+    document.querySelectorAll('[data-upgrade]').forEach(btn => btn.addEventListener('click', () => buyUpgrade(btn.dataset.upgrade)));
+    ui.startBtn.addEventListener('click', startGame);
+    ui.pauseBtn.addEventListener('click', togglePause);
+    ui.restartBtn.addEventListener('click', () => { resetGame(); startGame(); });
+    ui.playAgainBtn.addEventListener('click', () => { resetGame(); startGame(); });
+
+    resetGame();
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(loop);
   </script>
 </body>
 </html>
-
