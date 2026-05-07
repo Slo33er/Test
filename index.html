@@ -3,219 +3,227 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Thirteen: Full Set Rugby League</title>
+  <title>Thirteen: Premiership Rush</title>
   <style>
     :root {
-      --grass-1: #155b2d;
-      --grass-2: #0f4825;
-      --grass-3: #1d6d37;
-      --ink: #08111f;
-      --panel: rgba(8, 17, 31, 0.88);
-      --panel-2: rgba(16, 35, 62, 0.92);
-      --line: rgba(255, 255, 255, 0.22);
-      --text: #f4fbff;
-      --muted: #a8bdd2;
-      --gold: #ffd166;
-      --blue: #35b6ff;
-      --red: #ff5c73;
-      --mint: #64ffb7;
-      --shadow: 0 22px 70px rgba(0, 0, 0, 0.48);
+      --bg-a: #07131f;
+      --bg-b: #102a42;
+      --panel: rgba(6, 14, 25, 0.88);
+      --panel-soft: rgba(19, 42, 67, 0.78);
+      --line: rgba(255, 255, 255, 0.18);
+      --text: #f7fbff;
+      --muted: #a9bed0;
+      --blue: #19a7ff;
+      --blue-2: #74d8ff;
+      --red: #ff496b;
+      --red-2: #ff9aa9;
+      --gold: #ffd36a;
+      --grass: #16763a;
+      --grass-dark: #10542d;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.48);
     }
 
     * { box-sizing: border-box; }
-
-    html,
-    body {
-      min-height: 100%;
-      margin: 0;
-      color: var(--text);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:
-        radial-gradient(circle at 15% 10%, rgba(53, 182, 255, 0.26), transparent 32%),
-        radial-gradient(circle at 82% 20%, rgba(255, 92, 115, 0.22), transparent 31%),
-        linear-gradient(145deg, #07111c 0%, #0d1f34 45%, #07111c 100%);
-    }
-
+    html, body { min-height: 100%; margin: 0; }
     body {
       min-height: 100vh;
       display: grid;
       place-items: center;
       padding: 18px;
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(25, 167, 255, .28), transparent 29%),
+        radial-gradient(circle at 80% 18%, rgba(255, 73, 107, .22), transparent 30%),
+        linear-gradient(145deg, #06111d, #102943 48%, #07111c);
       overflow-x: hidden;
     }
 
     button {
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255,255,255,.18);
       border-radius: 14px;
       padding: 10px 14px;
-      background: linear-gradient(180deg, #274d78, #142842);
       color: var(--text);
+      background: linear-gradient(180deg, #315b85, #16304d);
       cursor: pointer;
-      font-weight: 900;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 8px 22px rgba(0,0,0,.25);
+      font-weight: 950;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 10px 24px rgba(0,0,0,.25);
       transition: transform .14s ease, filter .14s ease, border-color .14s ease;
     }
-
-    button:hover { transform: translateY(-1px); filter: brightness(1.08); border-color: rgba(53, 182, 255, 0.72); }
+    button:hover { transform: translateY(-1px); filter: brightness(1.08); border-color: rgba(116,216,255,.76); }
     button:active { transform: translateY(1px); }
-    button.primary { background: linear-gradient(180deg, #49d2ff, #117ad5); color: #04111e; border-color: #bdf2ff; }
-    button.danger { background: linear-gradient(180deg, #ff7184, #bc243d); }
+    .primary { color: #06111d; border-color: #b9efff; background: linear-gradient(180deg, #83e6ff, #1c96f2); }
+    .danger { background: linear-gradient(180deg, #ff7189, #ca2342); }
 
     .app {
-      width: min(1380px, 100%);
+      width: min(1420px, 100%);
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 350px;
+      grid-template-columns: minmax(0, 1fr) 355px;
       gap: 18px;
       align-items: stretch;
     }
 
-    .stadium,
-    .side {
-      border: 1px solid rgba(255,255,255,.16);
-      border-radius: 30px;
-      background: linear-gradient(180deg, rgba(17, 36, 62, .9), rgba(5, 13, 25, .92));
-      box-shadow: var(--shadow);
-      overflow: hidden;
+    .stage, .side {
       position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 30px;
+      background: linear-gradient(180deg, rgba(21,48,76,.94), rgba(5,13,24,.95));
+      box-shadow: var(--shadow);
     }
-
-    .stadium::before,
-    .side::before {
+    .stage::before, .side::before {
       content: "";
       position: absolute;
       inset: 0;
       pointer-events: none;
-      background: linear-gradient(120deg, rgba(255,255,255,.12), transparent 24%, transparent 76%, rgba(255,255,255,.06));
+      background: linear-gradient(120deg, rgba(255,255,255,.12), transparent 22%, transparent 78%, rgba(255,255,255,.06));
       mix-blend-mode: screen;
     }
 
     header {
       position: relative;
       z-index: 2;
-      padding: 18px 20px 10px;
+      padding: 18px 20px 12px;
       display: flex;
       justify-content: space-between;
+      align-items: center;
       gap: 14px;
       flex-wrap: wrap;
-      align-items: center;
     }
-
-    .brand { display: flex; gap: 14px; align-items: center; }
+    .brand { display: flex; align-items: center; gap: 14px; }
     .logo {
-      width: 58px;
-      height: 58px;
-      border-radius: 18px;
+      width: 62px;
+      height: 62px;
+      border-radius: 20px;
       display: grid;
       place-items: center;
-      background: conic-gradient(from 130deg, var(--blue), var(--mint), var(--gold), var(--red), var(--blue));
-      box-shadow: 0 0 32px rgba(53, 182, 255, .34);
+      background: conic-gradient(from 130deg, var(--blue), #76ffcf, var(--gold), var(--red), var(--blue));
+      box-shadow: 0 0 34px rgba(25,167,255,.34);
     }
+    .logo svg { width: 45px; height: 45px; filter: drop-shadow(0 5px 12px rgba(0,0,0,.46)); }
+    h1 { margin: 0; font-size: clamp(28px, 3.3vw, 46px); letter-spacing: -.065em; line-height: .95; }
+    .subtitle { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
+    .top-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
-    .logo svg { width: 43px; height: 43px; filter: drop-shadow(0 4px 10px rgba(0,0,0,.46)); }
-    h1 { margin: 0; font-size: clamp(25px, 3.2vw, 44px); letter-spacing: -0.055em; line-height: .98; }
-    .subtitle { margin: 5px 0 0; color: var(--muted); font-size: 14px; }
-    .top-actions { display: flex; gap: 9px; flex-wrap: wrap; }
+    .game-area { position: relative; z-index: 2; margin: 0 20px 20px; }
+    .score-strip {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 22px;
+      background: rgba(5,12,22,.68);
+    }
+    .team { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .team.away { justify-content: flex-end; text-align: right; }
+    .badge { width: 14px; height: 44px; border-radius: 999px; box-shadow: 0 0 16px currentColor; }
+    .team.home .badge { color: var(--blue); background: var(--blue); }
+    .team.away .badge { color: var(--red); background: var(--red); }
+    .name { color: var(--muted); font-size: 12px; font-weight: 950; letter-spacing: .08em; text-transform: uppercase; }
+    .points { font-size: 42px; line-height: 1; font-weight: 1000; letter-spacing: -.06em; }
+    .clock {
+      padding: 10px 18px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.15);
+      text-align: center;
+      min-width: 162px;
+    }
+    .clock b { display: block; font-size: 25px; }
+    .clock span { color: var(--gold); font-size: 12px; font-weight: 950; text-transform: uppercase; letter-spacing: .08em; }
 
-    .game-wrap { position: relative; z-index: 2; margin: 0 20px 20px; }
     canvas {
       display: block;
       width: 100%;
       aspect-ratio: 16 / 9;
       border-radius: 24px;
       border: 1px solid rgba(255,255,255,.22);
-      background: var(--grass-1);
-      image-rendering: auto;
+      background: #0b2718;
     }
 
-    .hud {
+    .floating-hud {
       position: absolute;
-      inset: 14px 14px auto 14px;
+      left: 16px;
+      right: 16px;
+      top: 92px;
       display: flex;
       justify-content: space-between;
       gap: 10px;
       pointer-events: none;
       font-weight: 950;
-      text-shadow: 0 2px 8px rgba(0,0,0,.75);
+      text-shadow: 0 2px 8px rgba(0,0,0,.72);
     }
-
-    .hud-left,
-    .hud-right { display: flex; gap: 8px; flex-wrap: wrap; }
+    .hud-group { display: flex; gap: 8px; flex-wrap: wrap; }
     .pill {
       padding: 8px 12px;
       border-radius: 999px;
-      background: rgba(4, 12, 22, .64);
       border: 1px solid rgba(255,255,255,.18);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 8px 18px rgba(0,0,0,.24);
+      background: rgba(4,10,18,.64);
+      backdrop-filter: blur(8px);
       font-size: 13px;
+      box-shadow: 0 8px 20px rgba(0,0,0,.25);
     }
-    .blue { color: #8fe0ff; }
-    .red { color: #ff9daa; }
-    .gold { color: var(--gold); }
-
-    .overlay {
-      position: absolute;
-      inset: 0;
-      z-index: 5;
-      display: grid;
-      place-items: center;
-      padding: 18px;
-      border-radius: 24px;
-      text-align: center;
-      background: radial-gradient(circle at 50% 36%, rgba(31, 73, 115, .9), rgba(4, 10, 18, .95));
-    }
-    .overlay.hidden { display: none; }
-    .modal {
-      width: min(820px, 100%);
-      padding: clamp(20px, 4vw, 40px);
-      border-radius: 30px;
-      border: 1px solid rgba(255,255,255,.18);
-      background: rgba(4, 12, 22, .78);
-      box-shadow: var(--shadow);
-    }
-    .modal h2 { margin: 0 0 10px; font-size: clamp(34px, 5vw, 70px); line-height: .92; letter-spacing: -0.07em; }
-    .modal p { color: var(--muted); line-height: 1.58; margin: 10px 0; }
-    .big { font-size: 18px; }
-
-    .help-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin: 20px 0;
-      text-align: left;
-    }
-    .help-card {
-      padding: 12px;
-      min-height: 105px;
-      border-radius: 18px;
-      background: rgba(255,255,255,.055);
-      border: 1px solid rgba(255,255,255,.12);
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
-    }
-    .help-card b { display: block; color: var(--text); margin-bottom: 6px; font-size: 14px; }
     .kbd {
       display: inline-grid;
       place-items: center;
       min-width: 25px;
       height: 24px;
       padding: 0 7px;
+      margin: 0 1px;
       border-radius: 7px;
-      background: rgba(255,255,255,.1);
+      background: rgba(255,255,255,.12);
       border: 1px solid rgba(255,255,255,.18);
-      color: #fff;
-      font-weight: 950;
       box-shadow: inset 0 -2px 0 rgba(0,0,0,.25);
+      color: white;
       font-size: 12px;
+      font-weight: 950;
     }
+
+    .overlay {
+      position: absolute;
+      inset: 82px 0 0;
+      z-index: 6;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      border-radius: 0 0 30px 30px;
+      background: radial-gradient(circle at 50% 35%, rgba(25,63,102,.94), rgba(4,10,18,.96));
+      text-align: center;
+    }
+    .overlay.hidden { display: none; }
+    .modal {
+      width: min(860px, 100%);
+      padding: clamp(20px, 4vw, 40px);
+      border-radius: 30px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(4, 12, 22, .80);
+      box-shadow: var(--shadow);
+    }
+    .modal h2 { margin: 0 0 10px; font-size: clamp(38px, 5vw, 74px); line-height: .9; letter-spacing: -.075em; }
+    .modal p { margin: 10px 0; color: var(--muted); line-height: 1.55; }
+    .big { font-size: 18px; }
+    .help-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 22px 0; text-align: left; }
+    .help-card {
+      min-height: 112px;
+      padding: 13px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.055);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.42;
+    }
+    .help-card b { display: block; margin-bottom: 6px; color: var(--text); font-size: 14px; }
 
     .side {
       padding: 18px;
       display: flex;
       flex-direction: column;
       gap: 14px;
-      min-height: 720px;
+      min-height: 760px;
     }
     .panel {
       position: relative;
@@ -225,88 +233,64 @@
       border: 1px solid rgba(255,255,255,.14);
       background: var(--panel);
     }
-    .panel h2,
-    .panel h3 { margin: 0 0 10px; letter-spacing: -0.035em; }
-    .panel h2 { font-size: 22px; }
+    .panel h2, .panel h3 { margin: 0 0 10px; letter-spacing: -.035em; }
+    .panel h2 { font-size: 23px; }
     .panel h3 { font-size: 16px; }
-    .panel p { margin: 7px 0; color: var(--muted); line-height: 1.45; }
+    .panel p { color: var(--muted); line-height: 1.45; margin: 7px 0; }
 
-    .scoreboard {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      gap: 10px;
-      align-items: center;
-      text-align: center;
-    }
-    .team-name { font-size: 12px; color: var(--muted); font-weight: 900; text-transform: uppercase; letter-spacing: .08em; }
-    .score { font-size: 42px; line-height: 1; font-weight: 1000; letter-spacing: -.06em; }
-    .versus { color: var(--gold); font-weight: 950; }
-
-    .meters { display: grid; gap: 11px; }
-    .meter-label { display: flex; justify-content: space-between; margin-bottom: 5px; color: var(--muted); font-size: 12px; font-weight: 900; }
-    .bar { height: 11px; border-radius: 99px; background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.11); overflow: hidden; }
-    .fill { height: 100%; width: 0%; border-radius: inherit; background: linear-gradient(90deg, var(--blue), var(--mint)); transition: width .12s linear; }
+    .meter { margin-top: 11px; }
+    .meter-label { display: flex; justify-content: space-between; margin-bottom: 6px; color: var(--muted); font-size: 12px; font-weight: 950; }
+    .bar { height: 12px; border-radius: 999px; overflow: hidden; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.11); }
+    .fill { height: 100%; width: 0%; border-radius: inherit; background: linear-gradient(90deg, var(--blue), #80ffd6); transition: width .15s linear; }
     .fill.red-fill { background: linear-gradient(90deg, var(--red), var(--gold)); }
 
     .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 9px; }
-    .stat {
-      padding: 11px;
-      border-radius: 16px;
-      background: rgba(255,255,255,.055);
-      border: 1px solid rgba(255,255,255,.1);
-    }
-    .stat small { display: block; color: var(--muted); font-weight: 900; text-transform: uppercase; font-size: 10px; letter-spacing: .07em; }
-    .stat b { font-size: 21px; }
-
-    .plays,
-    .log { display: grid; gap: 8px; }
-    .play {
-      padding: 10px;
-      border-radius: 14px;
-      background: rgba(255,255,255,.05);
-      border: 1px solid rgba(255,255,255,.1);
-      color: #d9edff;
-      font-size: 13px;
-      line-height: 1.35;
-    }
-    .play.good { border-color: rgba(100,255,183,.4); color: var(--mint); }
-    .play.warn { border-color: rgba(255,209,102,.45); color: var(--gold); }
-    .log { max-height: 150px; overflow: auto; padding-right: 3px; }
+    .stat { padding: 11px; border-radius: 16px; background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.1); }
+    .stat small { display: block; color: var(--muted); font-weight: 950; text-transform: uppercase; font-size: 10px; letter-spacing: .07em; }
+    .stat b { font-size: 22px; }
+    .mini-field { height: 24px; border-radius: 999px; position: relative; background: linear-gradient(90deg, rgba(25,167,255,.25), rgba(255,255,255,.12), rgba(255,73,107,.25)); border: 1px solid rgba(255,255,255,.14); overflow: hidden; }
+    .mini-ball { position: absolute; top: 4px; left: 50%; width: 16px; height: 16px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 10px var(--gold); transform: translateX(-50%); transition: left .15s linear; }
+    .plays, .log { display: grid; gap: 8px; }
+    .play { padding: 10px; border-radius: 14px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); color: #dcefff; font-size: 13px; line-height: 1.35; }
+    .play.good { color: #80ffd6; border-color: rgba(128,255,214,.4); }
+    .play.warn { color: var(--gold); border-color: rgba(255,211,106,.45); }
+    .log { max-height: 152px; overflow: auto; padding-right: 4px; }
     .log-entry { color: var(--muted); font-size: 12px; line-height: 1.35; }
-    .log-entry b { color: var(--blue); }
+    .log-entry b { color: var(--blue-2); }
 
-    @media (max-width: 1040px) {
+    @media (max-width: 1060px) {
       body { padding: 10px; }
       .app { grid-template-columns: 1fr; }
       .side { min-height: auto; }
       .help-grid { grid-template-columns: repeat(2, 1fr); }
+      .floating-hud { position: static; margin: 8px 0 0; }
     }
-
     @media (max-width: 620px) {
       header { align-items: flex-start; padding: 14px; }
-      .game-wrap { margin: 0 10px 10px; }
+      .game-area { margin: 0 10px 10px; }
+      .score-strip { grid-template-columns: 1fr; text-align: left; }
+      .team.away { justify-content: flex-start; text-align: left; }
       canvas { aspect-ratio: 4 / 3; }
-      .hud { position: static; margin: 8px 0 0; }
-      .hud-right { display: none; }
+      .hud-group.controls { display: none; }
       .help-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
   <main class="app">
-    <section class="stadium">
+    <section class="stage">
       <header>
         <div class="brand">
           <div class="logo" aria-hidden="true">
             <svg viewBox="0 0 64 64" role="img">
-              <rect x="7" y="16" width="50" height="32" rx="16" fill="#07111c" transform="rotate(-18 32 32)"/>
-              <path d="M18 31c7-8 21-13 34-12M13 36c10 7 22 10 38 8" fill="none" stroke="#fff3bf" stroke-width="3" stroke-linecap="round"/>
-              <path d="M23 20l15 29M39 16l15 28" stroke="#35b6ff" stroke-width="3" stroke-linecap="round"/>
+              <rect x="7" y="17" width="50" height="30" rx="15" fill="#07131f" transform="rotate(-19 32 32)"/>
+              <path d="M17 31c9-8 22-12 34-11M13 37c11 7 25 10 39 7" fill="none" stroke="#fff4c7" stroke-width="3" stroke-linecap="round"/>
+              <path d="M23 20l15 29M40 16l15 28" stroke="#19a7ff" stroke-width="3" stroke-linecap="round"/>
             </svg>
           </div>
           <div>
-            <h1>Thirteen: Full Set</h1>
-            <p class="subtitle">A complete one-file rugby league arcade match with original hand-drawn canvas assets.</p>
+            <h1>Thirteen: Premiership Rush</h1>
+            <p class="subtitle">Fast, readable rugby league: clean shapes, better spacing, smarter support, harder hits.</p>
           </div>
         </div>
         <div class="top-actions">
@@ -315,91 +299,81 @@
         </div>
       </header>
 
-      <div class="game-wrap">
-        <canvas id="game" width="1280" height="720" aria-label="Thirteen Full Set rugby league game canvas"></canvas>
-        <div class="hud" aria-live="polite">
-          <div class="hud-left">
-            <span class="pill" id="matchHud">00:00</span>
-            <span class="pill" id="setHud">Tackle 0 / 6</span>
-            <span class="pill" id="fieldHud">Halfway</span>
+      <div class="game-area">
+        <div class="score-strip" aria-live="polite">
+          <div class="team home"><span class="badge"></span><div><div class="name">Harbour Comets</div><div class="points" id="homeScore">0</div></div></div>
+          <div class="clock"><b id="clockText">00:00</b><span id="stateText">Kick-off</span></div>
+          <div class="team away"><div><div class="name">Western Ironbacks</div><div class="points" id="awayScore">0</div></div><span class="badge"></span></div>
+        </div>
+        <canvas id="game" width="1280" height="720" aria-label="Thirteen Premiership Rush rugby league game canvas"></canvas>
+        <div class="floating-hud">
+          <div class="hud-group">
+            <span class="pill" id="setHud">Comets · Tackle 0 / 6</span>
+            <span class="pill" id="territoryHud">25m</span>
           </div>
-          <div class="hud-right">
+          <div class="hud-group controls">
             <span class="pill">Move <span class="kbd">WASD</span>/<span class="kbd">←↑↓→</span></span>
             <span class="pill">Pass <span class="kbd">J</span>/<span class="kbd">L</span></span>
             <span class="pill">Kick <span class="kbd">K</span></span>
-            <span class="pill">Sprint/Tackle <span class="kbd">Shift</span>/<span class="kbd">Space</span></span>
+            <span class="pill">Step/Tackle <span class="kbd">Space</span></span>
+            <span class="pill">Sprint <span class="kbd">Shift</span></span>
           </div>
         </div>
+      </div>
 
-        <div class="overlay" id="startOverlay">
-          <div class="modal">
-            <h2>Play the full set.</h2>
-            <p class="big">Control the Harbour Comets through tackles, passes, kicks, turnovers, tries, conversions, restarts, defensive sets, and a live match clock.</p>
-            <div class="help-grid">
-              <div class="help-card"><b>Attack</b>Run with the ball, use support runners, pass backward with <span class="kbd">J</span>/<span class="kbd">L</span>, or kick deep with <span class="kbd">K</span>.</div>
-              <div class="help-card"><b>Defence</b>You control the nearest defender. Line up the carrier and hit <span class="kbd">Space</span> to complete tackles.</div>
-              <div class="help-card"><b>League Rules</b>Six tackles, knock-ons from bad passes, handovers, 40/20-style territory kicks, tries, and auto conversions.</div>
-              <div class="help-card"><b>Win</b>Score more than the Ironbacks before the final siren. Tries are 4, conversions are 2.</div>
-            </div>
-            <button class="primary" id="startBtn">Kick Off</button>
+      <div class="overlay" id="startOverlay">
+        <div class="modal">
+          <h2>Run the set like a pro.</h2>
+          <p class="big">A rebuilt full rugby league arcade match with cleaner visuals, 13-a-side spacing, set plays, tackle breaks, passing lanes, kicks, tries, conversions, restarts, and full-time drama.</p>
+          <div class="help-grid">
+            <div class="help-card"><b>Attack</b>Run at shoulders, hold <span class="kbd">Shift</span> to sprint, tap <span class="kbd">Space</span> for a sidestep, pass backward with <span class="kbd">J</span>/<span class="kbd">L</span>.</div>
+            <div class="help-card"><b>Last tackle</b>Use <span class="kbd">K</span> for a grubber or long kick. Good kicks pin the Ironbacks deep.</div>
+            <div class="help-card"><b>Defence</b>When the Ironbacks have it, you control the nearest defender. Close the gap and press <span class="kbd">Space</span>.</div>
+            <div class="help-card"><b>League flow</b>Six tackles, handovers, knock-ons, tries worth 4, automatic conversions worth 2.</div>
           </div>
+          <button class="primary" id="startBtn">Kick Off</button>
         </div>
+      </div>
 
-        <div class="overlay hidden" id="endOverlay">
-          <div class="modal">
-            <h2 id="endTitle">Full Time</h2>
-            <p class="big" id="endText"></p>
-            <button class="primary" id="againBtn">Run It Back</button>
-          </div>
+      <div class="overlay hidden" id="endOverlay">
+        <div class="modal">
+          <h2 id="endTitle">Full Time</h2>
+          <p class="big" id="endText"></p>
+          <button class="primary" id="againBtn">Run It Back</button>
         </div>
       </div>
     </section>
 
     <aside class="side">
       <section class="panel">
-        <h2>Match Centre</h2>
-        <div class="scoreboard">
-          <div>
-            <div class="team-name blue">Harbour Comets</div>
-            <div class="score" id="homeScore">0</div>
-          </div>
-          <div class="versus">v</div>
-          <div>
-            <div class="team-name red">Western Ironbacks</div>
-            <div class="score" id="awayScore">0</div>
-          </div>
+        <h2>Coach Box</h2>
+        <p id="coachSummary">Kick off to begin.</p>
+        <div class="meter">
+          <div class="meter-label"><span>Controlled Player Stamina</span><span id="staminaText">100%</span></div>
+          <div class="bar"><div class="fill" id="staminaBar"></div></div>
+        </div>
+        <div class="meter">
+          <div class="meter-label"><span>Comets Momentum</span><span id="momentumText">50%</span></div>
+          <div class="bar"><div class="fill red-fill" id="momentumBar"></div></div>
         </div>
       </section>
-
       <section class="panel">
-        <h3>Player Systems</h3>
-        <div class="meters">
-          <div>
-            <div class="meter-label"><span>Stamina</span><span id="staminaText">100%</span></div>
-            <div class="bar"><div class="fill" id="staminaBar"></div></div>
-          </div>
-          <div>
-            <div class="meter-label"><span>Momentum</span><span id="momentumText">50%</span></div>
-            <div class="bar"><div class="fill red-fill" id="momentumBar"></div></div>
-          </div>
-        </div>
+        <h3>Territory</h3>
+        <div class="mini-field"><span class="mini-ball" id="miniBall"></span></div>
       </section>
-
       <section class="panel">
         <h3>Live Stats</h3>
         <div class="stat-grid">
           <div class="stat"><small>Metres</small><b id="metresStat">0</b></div>
-          <div class="stat"><small>Line Breaks</small><b id="breaksStat">0</b></div>
+          <div class="stat"><small>Breaks</small><b id="breaksStat">0</b></div>
           <div class="stat"><small>Tackles</small><b id="tacklesStat">0</b></div>
           <div class="stat"><small>Errors</small><b id="errorsStat">0</b></div>
         </div>
       </section>
-
       <section class="panel">
         <h3>Coach Cues</h3>
         <div class="plays" id="plays"></div>
       </section>
-
       <section class="panel">
         <h3>Commentary</h3>
         <div class="log" id="log"></div>
@@ -412,13 +386,12 @@
     const ctx = canvas.getContext('2d');
     const W = canvas.width;
     const H = canvas.height;
-    const pitch = { x: 70, y: 70, w: 1140, h: 580, goal: 74 };
+    const field = { x: 64, y: 74, w: 1152, h: 572, goal: 80 };
     const keys = new Set();
-    const justPressed = new Set();
-    const rand = (min, max) => Math.random() * (max - min) + min;
+    const pressed = new Set();
     const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
-    const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
-
+    const rand = (min, max) => Math.random() * (max - min) + min;
+    const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
     const ui = {
       startOverlay: document.getElementById('startOverlay'),
       endOverlay: document.getElementById('endOverlay'),
@@ -428,15 +401,18 @@
       pauseBtn: document.getElementById('pauseBtn'),
       restartBtn: document.getElementById('restartBtn'),
       againBtn: document.getElementById('againBtn'),
-      matchHud: document.getElementById('matchHud'),
-      setHud: document.getElementById('setHud'),
-      fieldHud: document.getElementById('fieldHud'),
       homeScore: document.getElementById('homeScore'),
       awayScore: document.getElementById('awayScore'),
+      clockText: document.getElementById('clockText'),
+      stateText: document.getElementById('stateText'),
+      setHud: document.getElementById('setHud'),
+      territoryHud: document.getElementById('territoryHud'),
+      coachSummary: document.getElementById('coachSummary'),
       staminaText: document.getElementById('staminaText'),
       staminaBar: document.getElementById('staminaBar'),
       momentumText: document.getElementById('momentumText'),
       momentumBar: document.getElementById('momentumBar'),
+      miniBall: document.getElementById('miniBall'),
       metresStat: document.getElementById('metresStat'),
       breaksStat: document.getElementById('breaksStat'),
       tacklesStat: document.getElementById('tacklesStat'),
@@ -445,77 +421,73 @@
       log: document.getElementById('log')
     };
 
+    const roles = ['Fullback','Wing','Centre','Centre','Wing','Five-eighth','Halfback','Prop','Hooker','Prop','Second-row','Second-row','Lock'];
+    const lanes = [.50,.13,.29,.71,.87,.40,.60,.44,.52,.58,.30,.70,.50];
     const game = {
       running: false,
       paused: false,
       ended: false,
       clock: 0,
-      length: 300,
+      length: 240,
       possession: 'home',
-      attackingRight: true,
       tackle: 0,
-      playTheBall: 0,
-      phaseText: 'Kick-off waiting',
-      ball: null,
+      phase: 'Kick-off',
+      attackRight: true,
       home: [],
       away: [],
+      ball: null,
+      carrier: null,
       controlled: null,
-      ballCarrier: null,
-      passCooldown: 0,
-      kickCooldown: 0,
+      lastProgress: 25,
+      playLock: 0,
+      passLock: 0,
+      kickLock: 0,
+      stepLock: 0,
       shake: 0,
-      lastX: 0,
-      logs: [],
-      particles: [],
+      momentum: 52,
       score: { home: 0, away: 0 },
       stats: { metres: 0, breaks: 0, tackles: 0, errors: 0 },
-      momentum: 50
+      logs: [],
+      particles: [],
+      trails: []
     };
 
-    const formations = [
-      { role: 'Fullback', x: .12, y: .50 }, { role: 'Wing', x: .22, y: .16 }, { role: 'Centre', x: .28, y: .31 },
-      { role: 'Centre', x: .28, y: .69 }, { role: 'Wing', x: .22, y: .84 }, { role: 'Five-eighth', x: .40, y: .42 },
-      { role: 'Halfback', x: .40, y: .58 }, { role: 'Prop', x: .50, y: .42 }, { role: 'Hooker', x: .52, y: .50 },
-      { role: 'Prop', x: .50, y: .58 }, { role: 'Second-row', x: .60, y: .32 }, { role: 'Second-row', x: .60, y: .68 },
-      { role: 'Lock', x: .64, y: .50 }
-    ];
+    function xFromMetres(m) { return field.x + field.goal + clamp(m, 0, 100) / 100 * (field.w - field.goal * 2); }
+    function metresFromX(x) { return Math.round(clamp((x - field.x - field.goal) / (field.w - field.goal * 2) * 100, 0, 100)); }
+    function yLane(lane) { return field.y + lane * field.h; }
+    function activeSquad() { return game.possession === 'home' ? game.home : game.away; }
+    function defensiveSquad() { return game.possession === 'home' ? game.away : game.home; }
 
-    function fieldX(progress) { return pitch.x + pitch.goal + progress * (pitch.w - pitch.goal * 2); }
-    function fieldY(progress) { return pitch.y + progress * pitch.h; }
-    function metresFromX(x) { return Math.round(clamp((x - (pitch.x + pitch.goal)) / (pitch.w - pitch.goal * 2) * 100, 0, 100)); }
-
-    function makePlayer(team, i, progress, side) {
-      const f = formations[i];
-      const mirror = team === 'away';
+    function makePlayer(team, i) {
+      const isBack = i < 7;
       return {
         id: `${team}-${i}`,
         team,
         number: i + 1,
-        role: f.role,
-        x: fieldX(mirror ? 1 - progress : progress) + rand(-12, 12),
-        y: fieldY(f.y) + rand(-8, 8),
-        homeX: f.x,
-        homeY: f.y,
+        role: roles[i],
+        x: xFromMetres(team === 'home' ? 22 - i * .25 : 78 + i * .25),
+        y: yLane(lanes[i]),
+        tx: 0,
+        ty: 0,
         vx: 0,
         vy: 0,
-        r: i < 7 ? 15 : 17,
-        speed: i < 7 ? rand(132, 156) : rand(112, 138),
-        power: i < 7 ? rand(.78, 1) : rand(1.05, 1.32),
+        r: isBack ? 14.5 : 16,
+        topSpeed: isBack ? rand(178, 203) : rand(152, 176),
+        power: isBack ? rand(.82, 1) : rand(1.08, 1.34),
         stamina: 100,
-        selected: false,
         hasBall: false,
-        tackled: 0,
-        aiIntent: rand(0, 1),
-        side
+        selected: false,
+        tackleFlash: 0,
+        stepFlash: 0
       };
     }
 
-    function addLog(text) {
-      const minute = Math.floor(game.clock / 60).toString().padStart(2, '0');
-      const second = Math.floor(game.clock % 60).toString().padStart(2, '0');
-      game.logs.unshift(`<b>${minute}:${second}</b> ${text}`);
+    function log(text) {
+      const m = Math.floor(game.clock / 60).toString().padStart(2, '0');
+      const s = Math.floor(game.clock % 60).toString().padStart(2, '0');
+      game.logs.unshift(`<b>${m}:${s}</b> ${text}`);
       game.logs = game.logs.slice(0, 10);
-      ui.log.innerHTML = game.logs.map(line => `<div class="log-entry">${line}</div>`).join('');
+      ui.log.innerHTML = game.logs.map(item => `<div class="log-entry">${item}</div>`).join('');
     }
 
     function resetMatch() {
@@ -524,354 +496,357 @@
       game.ended = false;
       game.clock = 0;
       game.possession = 'home';
-      game.attackingRight = true;
       game.tackle = 0;
-      game.playTheBall = 0;
-      game.phaseText = 'Kick-off waiting';
-      game.passCooldown = 0;
-      game.kickCooldown = 0;
-      game.shake = 0;
-      game.logs = [];
-      game.particles = [];
+      game.phase = 'Kick-off';
+      game.attackRight = true;
+      game.home = roles.map((_, i) => makePlayer('home', i));
+      game.away = roles.map((_, i) => makePlayer('away', i));
       game.score = { home: 0, away: 0 };
       game.stats = { metres: 0, breaks: 0, tackles: 0, errors: 0 };
-      game.momentum = 50;
-      game.home = formations.map((_, i) => makePlayer('home', i, .25 + i * .012, -1));
-      game.away = formations.map((_, i) => makePlayer('away', i, .25 + i * .012, 1));
-      game.ballCarrier = game.home[8];
-      game.ballCarrier.hasBall = true;
-      game.controlled = game.ballCarrier;
-      game.lastX = game.ballCarrier.x;
-      game.ball = { x: game.ballCarrier.x + 7, y: game.ballCarrier.y, vx: 0, vy: 0, airborne: 0, owner: game.ballCarrier, loose: false };
+      game.momentum = 52;
+      game.logs = [];
+      game.particles = [];
+      game.trails = [];
+      game.playLock = 0;
+      game.passLock = 0;
+      game.kickLock = 0;
+      game.stepLock = 0;
+      giveBall('home', 25, .52, 'Comets receive. First set starts on the 25.');
       ui.startOverlay.classList.remove('hidden');
       ui.endOverlay.classList.add('hidden');
       ui.pauseBtn.textContent = 'Pause';
-      addLog('The Comets receive the kick-off. Build the set and find grass.');
+      log('The teams are set. Harbour Comets attacking left to right.');
       updateUI();
     }
 
     function startMatch() {
       game.running = true;
       game.paused = false;
-      game.ended = false;
       ui.startOverlay.classList.add('hidden');
       ui.endOverlay.classList.add('hidden');
-      addLog('Whistle! The first carry is underway.');
+      log('Kick-off! Use footwork first, pass after contact draws defenders.');
     }
 
-    function endMatch() {
-      game.running = false;
-      game.ended = true;
-      const hs = game.score.home;
-      const as = game.score.away;
-      const result = hs > as ? 'Comets Win!' : hs < as ? 'Ironbacks Win' : 'Golden Point Draw';
-      ui.endTitle.textContent = result;
-      ui.endText.textContent = `Full time: Harbour Comets ${hs}, Western Ironbacks ${as}. You made ${game.stats.metres} metres, ${game.stats.tackles} tackles, and ${game.stats.breaks} line breaks.`;
-      ui.endOverlay.classList.remove('hidden');
-    }
-
-    function setPossession(team, x = W / 2, y = H / 2, reason = 'handover') {
-      [...game.home, ...game.away].forEach(p => { p.hasBall = false; p.tackled = 0; });
+    function giveBall(team, metres, lane, reason) {
+      [...game.home, ...game.away].forEach(p => { p.hasBall = false; p.tackleFlash = 0; });
       game.possession = team;
-      game.attackingRight = team === 'home';
+      game.attackRight = team === 'home';
       game.tackle = 0;
-      game.playTheBall = .55;
+      game.phase = reason;
       const squad = team === 'home' ? game.home : game.away;
-      const carrier = nearest(squad, { x, y });
-      carrier.x = clamp(x, pitch.x + pitch.goal + 12, pitch.x + pitch.w - pitch.goal - 12);
-      carrier.y = clamp(y, pitch.y + 45, pitch.y + pitch.h - 45);
+      const carrier = squad[8];
+      carrier.x = xFromMetres(metres);
+      carrier.y = yLane(lane);
+      carrier.vx = 0;
+      carrier.vy = 0;
       carrier.hasBall = true;
-      game.ballCarrier = carrier;
-      game.controlled = team === 'home' ? carrier : nearest(game.home, carrier);
-      game.ball = { x: carrier.x + 7, y: carrier.y, vx: 0, vy: 0, airborne: 0, owner: carrier, loose: false };
-      game.lastX = carrier.x;
-      game.phaseText = reason;
-      spreadTeams();
-      addLog(`${team === 'home' ? 'Comets' : 'Ironbacks'} ball: ${reason}.`);
+      game.carrier = carrier;
+      game.ball = { x: carrier.x, y: carrier.y, vx: 0, vy: 0, loose: false, airborne: 0, target: null, kickedBy: null };
+      game.lastProgress = team === 'home' ? metres : 100 - metres;
+      game.playLock = .45;
+      shapeTeams();
     }
 
-    function spreadTeams() {
-      const carrier = game.ballCarrier || { x: W / 2, y: H / 2 };
-      const attack = game.possession === 'home' ? game.home : game.away;
-      const defend = game.possession === 'home' ? game.away : game.home;
-      const dir = game.attackingRight ? 1 : -1;
+    function shapeTeams() {
+      if (!game.carrier) return;
+      const dir = game.attackRight ? 1 : -1;
+      const attack = activeSquad();
+      const defence = defensiveSquad();
       attack.forEach((p, i) => {
-        if (p === game.ballCarrier) return;
-        p.x = clamp(carrier.x - dir * rand(45, 190), pitch.x + 90, pitch.x + pitch.w - 90);
-        p.y = clamp(fieldY(formations[i].y) + rand(-22, 22), pitch.y + 30, pitch.y + pitch.h - 30);
+        if (p === game.carrier) return;
+        const depth = 36 + (i % 5) * 24 + (i > 6 ? 28 : 0);
+        p.tx = clamp(game.carrier.x - dir * depth, field.x + 28, field.x + field.w - 28);
+        p.ty = clamp(yLane(lanes[i]) + (i % 2 ? -10 : 10), field.y + 34, field.y + field.h - 34);
       });
-      defend.forEach((p, i) => {
-        p.x = clamp(carrier.x + dir * rand(32, 145), pitch.x + 90, pitch.x + pitch.w - 90);
-        p.y = clamp(fieldY(formations[i].y) + rand(-18, 18), pitch.y + 30, pitch.y + pitch.h - 30);
+      defence.forEach((p, i) => {
+        const lineDepth = 44 + (i % 4) * 11;
+        p.tx = clamp(game.carrier.x + dir * lineDepth, field.x + 28, field.x + field.w - 28);
+        p.ty = clamp(yLane(lanes[i]) + (i % 3 - 1) * 12, field.y + 34, field.y + field.h - 34);
       });
     }
 
     function nearest(list, target) {
-      return list.reduce((best, p) => distance(p, target) < distance(best, target) ? p : best, list[0]);
+      return list.reduce((best, p) => dist(p, target) < dist(best, target) ? p : best, list[0]);
     }
 
     function update(dt) {
       if (!game.running || game.paused || game.ended) return;
       game.clock += dt;
-      game.passCooldown = Math.max(0, game.passCooldown - dt);
-      game.kickCooldown = Math.max(0, game.kickCooldown - dt);
-      game.playTheBall = Math.max(0, game.playTheBall - dt);
-      game.shake = Math.max(0, game.shake - dt * 20);
+      game.playLock = Math.max(0, game.playLock - dt);
+      game.passLock = Math.max(0, game.passLock - dt);
+      game.kickLock = Math.max(0, game.kickLock - dt);
+      game.stepLock = Math.max(0, game.stepLock - dt);
+      game.shake = Math.max(0, game.shake - dt * 22);
       if (game.clock >= game.length) return endMatch();
-
-      chooseControlledPlayer();
-      handleInput(dt);
-      updatePlayers(dt);
+      selectControlledPlayer();
+      readInput(dt);
+      updateAI(dt);
+      movePlayers(dt);
       updateBall(dt);
-      updateCollisions(dt);
+      resolveContact(dt);
+      checkTry();
       updateParticles(dt);
-      checkScoring();
       updateUI();
-      justPressed.clear();
+      pressed.clear();
     }
 
-    function chooseControlledPlayer() {
+    function selectControlledPlayer() {
       [...game.home, ...game.away].forEach(p => p.selected = false);
-      if (game.possession === 'home') game.controlled = game.ballCarrier;
-      else game.controlled = nearest(game.home, game.ballCarrier || game.ball);
+      game.controlled = game.possession === 'home' ? game.carrier : nearest(game.home, game.carrier || game.ball);
       if (game.controlled) game.controlled.selected = true;
     }
 
-    function handleInput(dt) {
+    function readInput(dt) {
       const p = game.controlled;
-      if (!p || p.tackled > 0 || game.playTheBall > 0) return;
+      if (!p || game.playLock > 0) return;
       const ax = (keys.has('d') || keys.has('arrowright') ? 1 : 0) - (keys.has('a') || keys.has('arrowleft') ? 1 : 0);
       const ay = (keys.has('s') || keys.has('arrowdown') ? 1 : 0) - (keys.has('w') || keys.has('arrowup') ? 1 : 0);
       const mag = Math.hypot(ax, ay) || 1;
-      const sprint = keys.has('shift') && p.stamina > 8;
-      const speed = p.speed * (sprint ? 1.42 : 1);
+      const sprint = keys.has('shift') && p.stamina > 5;
       if (ax || ay) {
-        p.vx += ax / mag * speed * 5.5 * dt;
-        p.vy += ay / mag * speed * 5.5 * dt;
+        const speed = p.topSpeed * (sprint ? 1.32 : 1);
+        p.vx += ax / mag * speed * 5.4 * dt;
+        p.vy += ay / mag * speed * 5.4 * dt;
         p.stamina = clamp(p.stamina - (sprint ? 24 : 8) * dt, 0, 100);
       } else {
-        p.stamina = clamp(p.stamina + 18 * dt, 0, 100);
+        p.stamina = clamp(p.stamina + 22 * dt, 0, 100);
       }
       if (game.possession === 'home') {
-        if (justPressed.has('j')) passBall(-1);
-        if (justPressed.has('l')) passBall(1);
-        if (justPressed.has('k')) kickBall();
-      } else if (justPressed.has(' ') && distance(p, game.ballCarrier) < 38) {
-        completeTackle(game.ballCarrier, p, true);
+        if (pressed.has(' ')) stepCarrier();
+        if (pressed.has('j')) passBall(-1);
+        if (pressed.has('l')) passBall(1);
+        if (pressed.has('k')) kickBall();
+      } else if (pressed.has(' ') && game.carrier && dist(p, game.carrier) < 46) {
+        completeTackle(game.carrier, p, true);
       }
     }
 
-    function updatePlayers(dt) {
-      const all = [...game.home, ...game.away];
-      const carrier = game.ballCarrier;
-      const dir = game.attackingRight ? 1 : -1;
-      all.forEach(p => {
-        if (p !== game.controlled && p.tackled <= 0 && game.playTheBall <= 0) runAI(p, dt, carrier, dir);
-        p.tackled = Math.max(0, p.tackled - dt);
-        p.vx *= Math.pow(.035, dt);
-        p.vy *= Math.pow(.035, dt);
-        p.x = clamp(p.x + p.vx * dt, pitch.x + 18, pitch.x + pitch.w - 18);
-        p.y = clamp(p.y + p.vy * dt, pitch.y + 18, pitch.y + pitch.h - 18);
-        p.stamina = clamp(p.stamina + (p === game.controlled ? 0 : 13 * dt), 0, 100);
-      });
-      if (carrier && carrier.hasBall) {
-        const gain = game.possession === 'home' ? carrier.x - game.lastX : game.lastX - carrier.x;
-        if (gain > 1) {
-          game.stats.metres += Math.floor(gain / 9);
-          game.momentum = clamp(game.momentum + gain * .035, 0, 100);
-          game.lastX = carrier.x;
-        }
-      }
-    }
-
-    function runAI(p, dt, carrier, dir) {
-      if (!carrier) return;
-      if (p.team === game.possession) {
-        if (p === carrier) {
-          const lane = Math.sin(game.clock * 1.8 + p.number) * 36;
-          p.vx += dir * p.speed * 2.3 * dt;
-          p.vy += (fieldY(.5) + lane - p.y) * 1.4 * dt;
-          if (Math.random() < .006 && game.possession === 'away') aiPassOrKick();
-        } else {
-          const supportX = carrier.x - dir * (48 + p.number * 8 % 150);
-          const supportY = fieldY(formations[p.number - 1].y);
-          p.vx += (supportX - p.x) * 1.8 * dt;
-          p.vy += (supportY - p.y) * 1.8 * dt;
-        }
-      } else {
-        const spacing = (p.number - 7) * 9;
-        p.vx += (carrier.x + dir * 18 - p.x) * 3.1 * dt;
-        p.vy += (carrier.y + spacing - p.y) * 2.8 * dt;
-      }
+    function stepCarrier() {
+      const p = game.carrier;
+      if (!p || game.stepLock > 0 || p.stamina < 14) return;
+      const dir = game.attackRight ? 1 : -1;
+      const laneShift = p.y < field.y + field.h / 2 ? 1 : -1;
+      p.vx += dir * 260;
+      p.vy += laneShift * 250;
+      p.stamina -= 14;
+      p.stepFlash = .35;
+      game.stepLock = .9;
+      game.phase = 'Sidestep!';
+      game.trails.push({ x: p.x, y: p.y, life: .35, color: '#ffd36a' });
     }
 
     function passBall(side) {
-      if (game.passCooldown > 0 || !game.ballCarrier) return;
-      const carrier = game.ballCarrier;
-      const squad = game.home;
-      const dir = game.attackingRight ? 1 : -1;
-      const options = squad
+      if (game.passLock > 0 || !game.carrier) return;
+      const carrier = game.carrier;
+      const dir = game.attackRight ? 1 : -1;
+      const options = game.home
         .filter(p => p !== carrier && (carrier.x - p.x) * dir > 8)
-        .sort((a, b) => Math.abs(a.y - (carrier.y + side * 70)) - Math.abs(b.y - (carrier.y + side * 70)));
+        .sort((a, b) => Math.abs(a.y - (carrier.y + side * 100)) - Math.abs(b.y - (carrier.y + side * 100)));
       const target = options[0];
-      if (!target) return addLog('No legal support runner behind the ball.');
-      const risky = Math.abs(target.y - carrier.y) > 135 || distance(target, carrier) > 225;
+      if (!target) return log('No legal support runner behind the ball.');
       carrier.hasBall = false;
-      game.ballCarrier = null;
-      game.ball = { x: carrier.x, y: carrier.y, vx: (target.x - carrier.x) * 2.4, vy: (target.y - carrier.y) * 2.4, airborne: .42, owner: null, loose: true, target };
-      game.passCooldown = .55;
-      game.phaseText = risky ? 'Floating pass!' : 'Pass away';
-      addLog(risky ? 'Risky cut-out pass thrown across the line.' : `Pass to the ${target.role}.`);
-    }
-
-    function aiPassOrKick() {
-      if (game.possession !== 'away' || game.passCooldown > 0 || !game.ballCarrier) return;
-      if (game.tackle >= 4 && Math.random() < .55) return kickBall(true);
-      const carrier = game.ballCarrier;
-      const dir = game.attackingRight ? 1 : -1;
-      const options = game.away.filter(p => p !== carrier && (carrier.x - p.x) * dir > 5);
-      const target = options[Math.floor(rand(0, options.length))];
-      if (!target) return;
-      carrier.hasBall = false;
-      game.ballCarrier = null;
-      game.ball = { x: carrier.x, y: carrier.y, vx: (target.x - carrier.x) * 2.3, vy: (target.y - carrier.y) * 2.3, airborne: .38, owner: null, loose: true, target };
-      game.passCooldown = .7;
+      game.carrier = null;
+      const risky = Math.abs(target.y - carrier.y) > 160 || dist(target, carrier) > 245;
+      game.ball = { x: carrier.x, y: carrier.y, vx: (target.x - carrier.x) * 2.65, vy: (target.y - carrier.y) * 2.65, loose: true, airborne: .36, target, kickedBy: null, risky };
+      game.passLock = .48;
+      game.phase = risky ? 'Risky cut-out pass' : 'Pass released';
+      log(risky ? 'Cut-out pass hangs in the air.' : `Crisp pass to the ${target.role}.`);
     }
 
     function kickBall(ai = false) {
-      if (game.kickCooldown > 0 || !game.ballCarrier) return;
-      const carrier = game.ballCarrier;
-      const dir = game.attackingRight ? 1 : -1;
+      if (game.kickLock > 0 || !game.carrier) return;
+      const carrier = game.carrier;
+      const dir = game.attackRight ? 1 : -1;
       carrier.hasBall = false;
-      game.ballCarrier = null;
-      game.ball = { x: carrier.x, y: carrier.y, vx: dir * rand(520, 680), vy: rand(-115, 115), airborne: 1.25, owner: null, loose: true, kickedBy: carrier.team };
-      game.kickCooldown = 1.2;
-      game.phaseText = 'Kick chase';
-      game.momentum = clamp(game.momentum + (carrier.team === 'home' ? 7 : -6), 0, 100);
-      addLog(`${carrier.team === 'home' ? 'Comets' : 'Ironbacks'} kick long into space.`);
-      if (!ai && metresFromX(carrier.x) < 40 && (game.attackingRight ? game.ball.vx > 0 : game.ball.vx < 0)) {
-        addLog('Territory kick! Chase hard for field position.');
+      game.carrier = null;
+      const grubber = game.tackle < 5 && (carrier.x * dir > xFromMetres(72) * dir);
+      game.ball = { x: carrier.x, y: carrier.y, vx: dir * (grubber ? 470 : 690), vy: rand(-90, 90), loose: true, airborne: grubber ? .22 : 1.0, target: null, kickedBy: carrier.team, risky: false };
+      game.kickLock = 1.1;
+      game.phase = grubber ? 'Grubber in behind' : 'Last-tackle kick';
+      game.momentum = clamp(game.momentum + (carrier.team === 'home' ? 5 : -5), 0, 100);
+      log(`${carrier.team === 'home' ? 'Comets' : 'Ironbacks'} ${grubber ? 'stab a grubber into the in-goal.' : 'kick deep for territory.'}`);
+    }
+
+    function updateAI(dt) {
+      if (!game.carrier || game.playLock > 0) return;
+      const dir = game.attackRight ? 1 : -1;
+      if (game.possession === 'away') {
+        const p = game.carrier;
+        p.vx += dir * p.topSpeed * 3.6 * dt;
+        p.vy += (Math.sin(game.clock * 2.4 + p.number) * 70 + yLane(.5) - p.y) * .9 * dt;
+        if (game.tackle >= 5 && game.kickLock <= 0 && Math.random() < .012) kickBall(true);
+      }
+      shapeTeams();
+      [...game.home, ...game.away].forEach(p => {
+        if (p === game.controlled || p === game.carrier) return;
+        p.vx += (p.tx - p.x) * 2.4 * dt;
+        p.vy += (p.ty - p.y) * 2.4 * dt;
+      });
+      if (game.possession === 'home') defensiveSquad().forEach(d => {
+        const target = game.carrier;
+        d.vx += (target.x - d.x) * 1.45 * dt;
+        d.vy += (target.y - d.y) * 1.35 * dt;
+      });
+    }
+
+    function movePlayers(dt) {
+      [...game.home, ...game.away].forEach(p => {
+        p.tackleFlash = Math.max(0, p.tackleFlash - dt);
+        p.stepFlash = Math.max(0, p.stepFlash - dt);
+        p.vx *= Math.pow(.028, dt);
+        p.vy *= Math.pow(.028, dt);
+        p.x = clamp(p.x + p.vx * dt, field.x + 18, field.x + field.w - 18);
+        p.y = clamp(p.y + p.vy * dt, field.y + 24, field.y + field.h - 24);
+        if (p !== game.controlled) p.stamina = clamp(p.stamina + 18 * dt, 0, 100);
+      });
+      if (game.carrier && game.carrier.hasBall) {
+        const current = game.possession === 'home' ? metresFromX(game.carrier.x) : 100 - metresFromX(game.carrier.x);
+        const gain = current - game.lastProgress;
+        if (gain > 1) {
+          game.stats.metres += Math.floor(gain);
+          game.lastProgress = current;
+          game.momentum = clamp(game.momentum + gain * .55, 0, 100);
+        }
       }
     }
 
     function updateBall(dt) {
       const b = game.ball;
       if (!b) return;
-      if (game.ballCarrier && game.ballCarrier.hasBall) {
-        b.owner = game.ballCarrier;
+      if (game.carrier && game.carrier.hasBall) {
+        b.x = game.carrier.x + (game.attackRight ? 13 : -13);
+        b.y = game.carrier.y - 1;
         b.loose = false;
-        b.x = game.ballCarrier.x + (game.attackingRight ? 10 : -10);
-        b.y = game.ballCarrier.y - 2;
         return;
       }
       b.x += b.vx * dt;
       b.y += b.vy * dt;
-      b.vx *= Math.pow(.28, dt);
-      b.vy *= Math.pow(.28, dt);
+      b.vx *= Math.pow(.24, dt);
+      b.vy *= Math.pow(.24, dt);
       b.airborne = Math.max(0, b.airborne - dt);
-      if (b.y < pitch.y + 16 || b.y > pitch.y + pitch.h - 16) {
-        b.vy *= -0.52;
-        b.y = clamp(b.y, pitch.y + 16, pitch.y + pitch.h - 16);
+      if (b.y < field.y + 18 || b.y > field.y + field.h - 18) {
+        b.y = clamp(b.y, field.y + 18, field.y + field.h - 18);
+        b.vy *= -.48;
       }
       const all = [...game.home, ...game.away];
-      const catcher = all.find(p => distance(p, b) < (b.airborne > .18 ? 18 : 27));
+      const catcher = all.find(p => dist(p, b) < (b.airborne > .15 ? 18 : 28));
       if (catcher) catchBall(catcher);
-      if (b.x < pitch.x || b.x > pitch.x + pitch.w) {
-        const team = b.kickedBy === 'home' ? 'away' : 'home';
-        setPossession(team, clamp(b.x, pitch.x + pitch.goal + 20, pitch.x + pitch.w - pitch.goal - 20), b.y, 'ball over dead-ball line');
+      if (b.x < field.x - 24 || b.x > field.x + field.w + 24) {
+        const receiver = b.kickedBy === 'home' ? 'away' : 'home';
+        giveBall(receiver, receiver === 'home' ? 20 : 80, .5, 'Dead ball restart');
+        log('The kick runs dead. Seven-tackle restart energy for the defence.');
       }
     }
 
     function catchBall(p) {
-      const bad = game.ball.target && p.team === game.ball.target.team && p !== game.ball.target && Math.random() < .45;
-      const knockOn = bad || (game.ball.airborne > .1 && Math.random() < (p.team === 'home' ? .04 : .08));
+      const badPass = game.ball.risky && p === game.ball.target && Math.random() < .32;
+      const pressure = nearest(p.team === 'home' ? game.away : game.home, p);
+      const contested = pressure && dist(pressure, p) < 34;
+      const knockOn = badPass || (contested && Math.random() < .16);
       if (knockOn) {
-        game.stats.errors += p.team === 'home' ? 1 : 0;
-        game.momentum = clamp(game.momentum + (p.team === 'home' ? -12 : 10), 0, 100);
-        burst(p.x, p.y, 18, '#ffd166');
-        setPossession(p.team === 'home' ? 'away' : 'home', p.x, p.y, 'knock-on scrum handover');
+        if (p.team === 'home') game.stats.errors += 1;
+        burst(p.x, p.y, 20, '#ffd36a');
+        giveBall(p.team === 'home' ? 'away' : 'home', metresFromX(p.x), (p.y - field.y) / field.h, 'Knock-on handover');
+        log(`${p.team === 'home' ? 'Comets' : 'Ironbacks'} spill it under pressure.`);
         return;
       }
-      [...game.home, ...game.away].forEach(player => player.hasBall = false);
+      [...game.home, ...game.away].forEach(x => x.hasBall = false);
       p.hasBall = true;
-      game.ballCarrier = p;
+      game.carrier = p;
       game.possession = p.team;
-      game.attackingRight = p.team === 'home';
-      game.ball.owner = p;
+      game.attackRight = p.team === 'home';
       game.ball.loose = false;
-      game.tackle = game.ball.kickedBy && game.ball.kickedBy !== p.team ? 0 : game.tackle;
-      game.lastX = p.x;
-      addLog(`${p.team === 'home' ? 'Comets' : 'Ironbacks'} ${p.role} gathers the ball.`);
+      game.ball.kickedBy = null;
+      game.lastProgress = p.team === 'home' ? metresFromX(p.x) : 100 - metresFromX(p.x);
+      game.phase = `${p.role} catches`;
+      log(`${p.team === 'home' ? 'Comets' : 'Ironbacks'} ${p.role} gathers cleanly.`);
     }
 
-    function updateCollisions(dt) {
-      if (!game.ballCarrier || game.playTheBall > 0) return;
-      const carrier = game.ballCarrier;
-      const defenders = carrier.team === 'home' ? game.away : game.home;
-      const close = defenders.filter(p => distance(p, carrier) < carrier.r + p.r + 3);
-      if (close.length) {
-        const tackler = close.sort((a, b) => distance(a, carrier) - distance(b, carrier))[0];
-        const chance = .55 + close.length * .16 + tackler.power * .08 - carrier.power * .08;
-        if (Math.random() < chance * dt * 7.5) completeTackle(carrier, tackler, tackler.team === 'home');
-        else {
-          carrier.vx += (game.attackingRight ? 1 : -1) * 85 * dt * carrier.power;
-          carrier.vy += rand(-30, 30) * dt;
-          if (Math.random() < .08) game.stats.breaks += carrier.team === 'home' ? 1 : 0;
-        }
+    function resolveContact(dt) {
+      if (!game.carrier || game.playLock > 0) return;
+      const defenders = defensiveSquad();
+      const carrier = game.carrier;
+      const close = defenders.filter(d => dist(d, carrier) < d.r + carrier.r + 6);
+      if (!close.length) return;
+      const tackler = close.sort((a, b) => dist(a, carrier) - dist(b, carrier))[0];
+      const breakChance = carrier.stepFlash > 0 ? .72 : .18 + carrier.power * .1 - tackler.power * .06;
+      if (Math.random() < breakChance * dt * 3.4) {
+        const dir = game.attackRight ? 1 : -1;
+        carrier.vx += dir * 190;
+        carrier.vy += rand(-120, 120);
+        tackler.vx -= dir * 130;
+        tackler.tackleFlash = .32;
+        if (carrier.team === 'home' && Math.random() < .35) game.stats.breaks += 1;
+        game.phase = 'Tackle bust!';
+        burst(carrier.x, carrier.y, 8, '#80ffd6');
+      } else if (Math.random() < dt * (close.length > 1 ? 6.2 : 3.5)) {
+        completeTackle(carrier, tackler, tackler.team === 'home');
       }
     }
 
     function completeTackle(carrier, tackler, userMade) {
-      if (!carrier || carrier.tackled > 0) return;
-      carrier.tackled = .65;
-      carrier.vx *= .08;
-      carrier.vy *= .08;
+      if (!carrier || game.playLock > .1) return;
       game.tackle += 1;
-      game.playTheBall = .72;
-      game.phaseText = `Tackle ${game.tackle}`;
-      game.shake = 8;
-      burst(carrier.x, carrier.y, 12, userMade ? '#64ffb7' : '#ffffff');
+      game.playLock = .78;
+      game.shake = 9;
+      carrier.vx = 0;
+      carrier.vy = 0;
+      tackler.tackleFlash = .45;
+      carrier.tackleFlash = .45;
       if (tackler.team === 'home') game.stats.tackles += 1;
-      const homeInPossession = carrier.team === 'home';
-      game.momentum = clamp(game.momentum + (homeInPossession ? -4 : 4), 0, 100);
-      addLog(`${tackler.team === 'home' ? 'Comets' : 'Ironbacks'} ${tackler.role} completes tackle ${game.tackle}.`);
+      game.momentum = clamp(game.momentum + (carrier.team === 'home' ? -4 : 5), 0, 100);
+      game.phase = `Tackle ${game.tackle}`;
+      burst(carrier.x, carrier.y, userMade ? 18 : 12, userMade ? '#80ffd6' : '#ffffff');
+      log(`${tackler.team === 'home' ? 'Comets' : 'Ironbacks'} ${tackler.role} nails tackle ${game.tackle}.`);
       if (game.tackle >= 6) {
+        const next = carrier.team === 'home' ? 'away' : 'home';
+        const m = metresFromX(carrier.x);
         setTimeout(() => {
-          if (!game.ended) setPossession(carrier.team === 'home' ? 'away' : 'home', carrier.x, carrier.y, 'six-tackle handover');
-        }, 120);
+          giveBall(next, m, (carrier.y - field.y) / field.h, 'Six-tackle handover');
+          log(`Handover after six. ${next === 'home' ? 'Comets' : 'Ironbacks'} ball.`);
+        }, 170);
       } else {
         setTimeout(() => {
-          if (!game.ended && game.ballCarrier === carrier) {
-            carrier.tackled = 0;
-            game.lastX = carrier.x;
-            spreadTeams();
+          if (!game.ended && game.carrier === carrier) {
+            game.playLock = .25;
+            game.lastProgress = carrier.team === 'home' ? metresFromX(carrier.x) : 100 - metresFromX(carrier.x);
+            shapeTeams();
           }
-        }, 240);
+        }, 220);
       }
     }
 
-    function checkScoring() {
-      const c = game.ballCarrier;
-      if (!c || !c.hasBall) return;
-      if (c.team === 'home' && c.x > pitch.x + pitch.w - pitch.goal + 8) scoreTry('home', c);
-      if (c.team === 'away' && c.x < pitch.x + pitch.goal - 8) scoreTry('away', c);
+    function checkTry() {
+      if (!game.carrier) return;
+      if (game.carrier.team === 'home' && game.carrier.x > field.x + field.w - field.goal + 4) scoreTry('home', game.carrier);
+      if (game.carrier.team === 'away' && game.carrier.x < field.x + field.goal - 4) scoreTry('away', game.carrier);
     }
 
     function scoreTry(team, scorer) {
       game.score[team] += 4;
-      const conversion = Math.random() < (Math.abs(scorer.y - fieldY(.5)) < 145 ? .78 : .48);
+      const nearPosts = Math.abs(scorer.y - yLane(.5)) < 145;
+      const conversion = Math.random() < (nearPosts ? .82 : .55);
       if (conversion) game.score[team] += 2;
-      game.momentum = clamp(game.momentum + (team === 'home' ? 18 : -18), 0, 100);
-      burst(scorer.x, scorer.y, 60, team === 'home' ? '#35b6ff' : '#ff5c73');
-      addLog(`${team === 'home' ? 'COMETS' : 'IRONBACKS'} TRY! ${scorer.role} grounds it. ${conversion ? 'Conversion successful.' : 'Conversion missed.'}`);
-      const restartTeam = team === 'home' ? 'away' : 'home';
-      setPossession(restartTeam, W / 2, H / 2, 'restart after try');
+      game.momentum = clamp(game.momentum + (team === 'home' ? 20 : -20), 0, 100);
+      burst(scorer.x, scorer.y, 70, team === 'home' ? '#19a7ff' : '#ff496b');
+      log(`${team === 'home' ? 'COMETS' : 'IRONBACKS'} TRY! ${scorer.role} finishes. ${conversion ? 'Conversion good.' : 'Conversion waved away.'}`);
+      giveBall(team === 'home' ? 'away' : 'home', 50, .5, 'Restart after try');
+    }
+
+    function endMatch() {
+      game.running = false;
+      game.ended = true;
+      const home = game.score.home;
+      const away = game.score.away;
+      ui.endTitle.textContent = home > away ? 'Comets Win!' : home < away ? 'Ironbacks Win' : 'Full-Time Draw';
+      ui.endText.textContent = `Harbour Comets ${home} - ${away} Western Ironbacks. Metres: ${game.stats.metres}, tackles: ${game.stats.tackles}, line breaks: ${game.stats.breaks}, errors: ${game.stats.errors}.`;
+      ui.endOverlay.classList.remove('hidden');
     }
 
     function burst(x, y, count, color) {
       for (let i = 0; i < count; i++) {
         const a = rand(0, Math.PI * 2);
-        const s = rand(45, 240);
+        const s = rand(45, 260);
         game.particles.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, r: rand(2, 5), life: rand(.35, 1), max: 1, color });
       }
     }
@@ -882,195 +857,245 @@
         p.life -= dt;
         p.x += p.vx * dt;
         p.y += p.vy * dt;
-        p.vx *= Math.pow(.16, dt);
-        p.vy *= Math.pow(.16, dt);
+        p.vx *= Math.pow(.14, dt);
+        p.vy *= Math.pow(.14, dt);
         if (p.life <= 0) game.particles.splice(i, 1);
+      }
+      for (let i = game.trails.length - 1; i >= 0; i--) {
+        game.trails[i].life -= dt;
+        if (game.trails[i].life <= 0) game.trails.splice(i, 1);
       }
     }
 
     function updateUI() {
-      const minute = Math.floor(game.clock / 60).toString().padStart(2, '0');
-      const second = Math.floor(game.clock % 60).toString().padStart(2, '0');
-      const selected = game.controlled || { stamina: 0 };
-      ui.matchHud.textContent = `${minute}:${second}`;
-      ui.setHud.textContent = `${game.possession === 'home' ? 'Comets' : 'Ironbacks'} · Tackle ${game.tackle} / 6`;
-      ui.fieldHud.textContent = `${metresFromX((game.ballCarrier || game.ball).x)}m · ${game.phaseText}`;
+      const mins = Math.floor(game.clock / 60).toString().padStart(2, '0');
+      const secs = Math.floor(game.clock % 60).toString().padStart(2, '0');
+      const ballX = game.carrier ? game.carrier.x : game.ball.x;
+      const metres = metresFromX(ballX);
+      const controlled = game.controlled || { stamina: 0 };
       ui.homeScore.textContent = game.score.home;
       ui.awayScore.textContent = game.score.away;
-      ui.staminaText.textContent = `${Math.round(selected.stamina)}%`;
-      ui.staminaBar.style.width = `${selected.stamina}%`;
+      ui.clockText.textContent = `${mins}:${secs}`;
+      ui.stateText.textContent = game.phase;
+      ui.setHud.textContent = `${game.possession === 'home' ? 'Comets' : 'Ironbacks'} · Tackle ${game.tackle} / 6`;
+      ui.territoryHud.textContent = `${metres}m`;
+      ui.coachSummary.textContent = game.possession === 'home' ? 'Ball in hand. Draw defenders, pass late, kick on the last.' : 'Defensive set. You control the nearest Comet defender.';
+      ui.staminaText.textContent = `${Math.round(controlled.stamina)}%`;
+      ui.staminaBar.style.width = `${controlled.stamina}%`;
       ui.momentumText.textContent = `${Math.round(game.momentum)}%`;
       ui.momentumBar.style.width = `${game.momentum}%`;
+      ui.miniBall.style.left = `${metres}%`;
       ui.metresStat.textContent = game.stats.metres;
       ui.breaksStat.textContent = game.stats.breaks;
       ui.tacklesStat.textContent = game.stats.tackles;
       ui.errorsStat.textContent = game.stats.errors;
-      ui.plays.innerHTML = coachCues().map(c => `<div class="play ${c.kind}">${c.text}</div>`).join('');
+      ui.plays.innerHTML = coachCues(metres).map(c => `<div class="play ${c.kind}">${c.text}</div>`).join('');
     }
 
-    function coachCues() {
-      const carrier = game.ballCarrier || game.ball;
-      const metres = metresFromX(carrier.x);
-      const cues = [];
+    function coachCues(metres) {
       if (game.possession === 'home') {
-        cues.push({ kind: 'good', text: `Attack right: ${100 - metres} metres from the Ironbacks try-line.` });
-        cues.push({ kind: game.tackle >= 5 ? 'warn' : '', text: game.tackle >= 5 ? 'Last tackle: kick to the corner with K.' : 'Keep support runners behind the ball before passing.' });
-        cues.push({ kind: '', text: 'Sprint only through gaps; stamina controls tackle-break speed.' });
-      } else {
-        cues.push({ kind: 'warn', text: 'Defence: you control the nearest Comet to the ball carrier.' });
-        cues.push({ kind: 'good', text: 'Press Space when shoulder-to-shoulder to finish the tackle.' });
-        cues.push({ kind: '', text: 'Hold the line and push them toward the touchline.' });
+        return [
+          { kind: metres > 72 ? 'good' : '', text: metres > 72 ? 'Red zone: pass wide or grubber behind the line.' : 'Run at inside shoulders to bend the line.' },
+          { kind: game.tackle >= 5 ? 'warn' : '', text: game.tackle >= 5 ? 'Last tackle. Kick with K or risk the handover.' : 'Support runners stay behind you, so pass late.' },
+          { kind: '', text: 'Space is a sidestep on attack; Shift burns stamina for pace.' }
+        ];
       }
-      return cues;
+      return [
+        { kind: 'warn', text: 'Defence: close down the carrier, then press Space.' },
+        { kind: 'good', text: 'Multiple defenders nearby make tackles more reliable.' },
+        { kind: '', text: 'Force them sideways and let the tackle count climb.' }
+      ];
     }
 
     function draw() {
       ctx.save();
       ctx.translate(rand(-game.shake, game.shake), rand(-game.shake, game.shake));
+      drawStadium();
       drawField();
+      drawTrails();
       drawPlayers(game.away);
       drawPlayers(game.home);
       drawBall();
       drawParticles();
       drawReferee();
-      drawPaused();
+      drawMessage();
       ctx.restore();
+    }
+
+    function drawStadium() {
+      ctx.fillStyle = '#07131f';
+      ctx.fillRect(0, 0, W, H);
+      for (let side of [0, 1]) {
+        const y = side ? H - 58 : 0;
+        const grd = ctx.createLinearGradient(0, y, W, y + 58);
+        grd.addColorStop(0, '#112a42');
+        grd.addColorStop(.5, '#1c456a');
+        grd.addColorStop(1, '#112a42');
+        ctx.fillStyle = grd;
+        ctx.fillRect(0, y, W, 58);
+        for (let i = 0; i < 130; i++) {
+          ctx.fillStyle = ['#19a7ff', '#ff496b', '#ffd36a', '#f7fbff'][i % 4];
+          ctx.globalAlpha = .22;
+          ctx.fillRect(i * 10 + (side ? 3 : 0), y + 10 + (i % 4) * 8, 4, 4);
+        }
+        ctx.globalAlpha = 1;
+      }
     }
 
     function drawField() {
-      const grass = ctx.createLinearGradient(0, pitch.y, 0, pitch.y + pitch.h);
-      grass.addColorStop(0, '#1d743b');
-      grass.addColorStop(.5, '#155b2d');
-      grass.addColorStop(1, '#0f4825');
-      ctx.fillStyle = '#07111c';
-      ctx.fillRect(0, 0, W, H);
+      const grass = ctx.createLinearGradient(0, field.y, 0, field.y + field.h);
+      grass.addColorStop(0, '#1d8542');
+      grass.addColorStop(.5, '#146333');
+      grass.addColorStop(1, '#0f4d2a');
       ctx.fillStyle = grass;
-      roundRect(pitch.x, pitch.y, pitch.w, pitch.h, 18);
+      roundRect(field.x, field.y, field.w, field.h, 22);
       ctx.fill();
-      for (let i = 0; i < 12; i++) {
+      for (let i = 0; i < 13; i++) {
         ctx.fillStyle = i % 2 ? 'rgba(255,255,255,.035)' : 'rgba(0,0,0,.055)';
-        ctx.fillRect(pitch.x, pitch.y + i * pitch.h / 12, pitch.w, pitch.h / 12);
+        ctx.fillRect(field.x, field.y + i * field.h / 13, field.w, field.h / 13);
       }
-      ctx.strokeStyle = 'rgba(255,255,255,.82)';
+      ctx.strokeStyle = 'rgba(255,255,255,.88)';
       ctx.lineWidth = 3;
-      ctx.strokeRect(pitch.x, pitch.y, pitch.w, pitch.h);
-      ctx.fillStyle = 'rgba(53,182,255,.12)';
-      ctx.fillRect(pitch.x, pitch.y, pitch.goal, pitch.h);
-      ctx.fillStyle = 'rgba(255,92,115,.12)';
-      ctx.fillRect(pitch.x + pitch.w - pitch.goal, pitch.y, pitch.goal, pitch.h);
+      roundRect(field.x, field.y, field.w, field.h, 22);
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(25,167,255,.15)';
+      ctx.fillRect(field.x, field.y, field.goal, field.h);
+      ctx.fillStyle = 'rgba(255,73,107,.15)';
+      ctx.fillRect(field.x + field.w - field.goal, field.y, field.goal, field.h);
       for (let m = 0; m <= 100; m += 10) {
-        const x = fieldX(m / 100);
-        ctx.strokeStyle = m === 50 ? 'rgba(255,255,255,.9)' : 'rgba(255,255,255,.45)';
+        const x = xFromMetres(m);
+        ctx.strokeStyle = m === 50 ? 'rgba(255,255,255,.95)' : 'rgba(255,255,255,.42)';
         ctx.lineWidth = m === 50 ? 4 : 2;
         ctx.beginPath();
-        ctx.moveTo(x, pitch.y);
-        ctx.lineTo(x, pitch.y + pitch.h);
+        ctx.moveTo(x, field.y);
+        ctx.lineTo(x, field.y + field.h);
         ctx.stroke();
         if (m > 0 && m < 100) {
-          ctx.fillStyle = 'rgba(255,255,255,.7)';
+          ctx.fillStyle = 'rgba(255,255,255,.76)';
           ctx.font = '900 18px system-ui';
           ctx.textAlign = 'center';
-          ctx.fillText(String(m), x, pitch.y + 32);
-          ctx.fillText(String(100 - m), x, pitch.y + pitch.h - 18);
+          ctx.fillText(String(m), x, field.y + 28);
+          ctx.fillText(String(100 - m), x, field.y + field.h - 16);
         }
       }
-      drawPosts(pitch.x + 24, fieldY(.5), '#35b6ff');
-      drawPosts(pitch.x + pitch.w - 24, fieldY(.5), '#ff5c73');
-      ctx.fillStyle = 'rgba(255,255,255,.88)';
-      ctx.font = '950 20px system-ui';
+      ctx.fillStyle = 'rgba(255,255,255,.9)';
+      ctx.font = '950 18px system-ui';
       ctx.textAlign = 'center';
-      ctx.fillText('HARBOUR COMETS IN-GOAL', pitch.x + 38, fieldY(.5));
-      ctx.save();
-      ctx.translate(pitch.x + pitch.w - 38, fieldY(.5));
-      ctx.rotate(Math.PI);
-      ctx.fillText('IRONBACKS IN-GOAL', 0, 0);
-      ctx.restore();
+      ctx.fillText('COMETS IN-GOAL', field.x + field.goal / 2, field.y + field.h / 2);
+      ctx.fillText('IRONBACKS IN-GOAL', field.x + field.w - field.goal / 2, field.y + field.h / 2);
+      drawPosts(field.x + 28, field.y + field.h / 2, '#19a7ff');
+      drawPosts(field.x + field.w - 28, field.y + field.h / 2, '#ff496b');
     }
 
-    function drawPosts(x, y, color) {
+    function drawPosts(x, y, glow) {
       ctx.save();
-      ctx.strokeStyle = '#fff7cc';
+      ctx.strokeStyle = '#fff7d1';
       ctx.lineWidth = 5;
-      ctx.shadowColor = color;
-      ctx.shadowBlur = 12;
+      ctx.shadowColor = glow;
+      ctx.shadowBlur = 16;
       ctx.beginPath();
-      ctx.moveTo(x, y - 58);
-      ctx.lineTo(x, y + 58);
-      ctx.moveTo(x - 24, y - 58);
-      ctx.lineTo(x + 24, y - 58);
+      ctx.moveTo(x, y - 58); ctx.lineTo(x, y + 58);
+      ctx.moveTo(x - 25, y - 58); ctx.lineTo(x + 25, y - 58);
       ctx.stroke();
       ctx.restore();
     }
 
-    function drawPlayers(players) {
-      players.sort((a, b) => a.y - b.y).forEach(drawPlayer);
+    function drawTrails() {
+      game.trails.forEach(t => {
+        ctx.save();
+        ctx.globalAlpha = clamp(t.life / .35, 0, 1);
+        ctx.strokeStyle = t.color;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(t.x, t.y, 34 * (1 - t.life / .35), 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      });
+    }
+
+    function drawPlayers(list) {
+      [...list].sort((a, b) => a.y - b.y).forEach(drawPlayer);
     }
 
     function drawPlayer(p) {
-      const teamColor = p.team === 'home' ? '#35b6ff' : '#ff5c73';
-      const trim = p.team === 'home' ? '#08111f' : '#fff3bf';
+      const main = p.team === 'home' ? '#19a7ff' : '#ff496b';
+      const trim = p.team === 'home' ? '#07131f' : '#fff0c2';
+      const facing = p.hasBall ? (game.attackRight ? 1 : -1) : Math.sign(p.vx || (p.team === 'home' ? 1 : -1));
       ctx.save();
       ctx.translate(p.x, p.y);
-      const facing = p.hasBall ? (game.attackingRight ? 1 : -1) : Math.sign(p.vx || (p.team === 'home' ? 1 : -1));
       ctx.scale(facing || 1, 1);
       if (p.selected) {
-        ctx.strokeStyle = '#ffd166';
+        ctx.strokeStyle = '#ffd36a';
         ctx.lineWidth = 4;
+        ctx.shadowColor = '#ffd36a';
+        ctx.shadowBlur = 12;
         ctx.beginPath();
-        ctx.arc(0, 0, p.r + 8 + Math.sin(game.clock * 8) * 2, 0, Math.PI * 2);
+        ctx.arc(0, 0, p.r + 9 + Math.sin(game.clock * 9) * 2, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+      }
+      if (p.stepFlash > 0) {
+        ctx.strokeStyle = 'rgba(255,211,106,.8)';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.arc(0, 0, p.r + 16, 0, Math.PI * 2);
         ctx.stroke();
       }
-      ctx.globalAlpha = p.tackled > 0 ? .72 : 1;
-      ctx.shadowColor = 'rgba(0,0,0,.45)';
+      ctx.globalAlpha = p.tackleFlash > 0 ? .76 : 1;
+      ctx.shadowColor = 'rgba(0,0,0,.48)';
       ctx.shadowBlur = 8;
       ctx.fillStyle = '#1b120d';
       ctx.beginPath();
-      ctx.arc(2, -17, 8, 0, Math.PI * 2);
+      ctx.arc(0, -18, 7.5, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = teamColor;
-      roundRect(-12, -12, 24, 27, 8);
+      ctx.fillStyle = main;
+      roundRect(-13, -12, 26, 28, 8);
       ctx.fill();
       ctx.fillStyle = trim;
-      ctx.fillRect(-12, -4, 24, 5);
+      ctx.fillRect(-13, -5, 26, 5);
       ctx.fillStyle = '#fff';
-      ctx.font = '900 11px system-ui';
+      ctx.font = '950 11px system-ui';
       ctx.textAlign = 'center';
       ctx.fillText(p.number, 0, 9);
-      ctx.strokeStyle = '#142033';
+      ctx.strokeStyle = '#0a1523';
       ctx.lineWidth = 5;
+      ctx.lineCap = 'round';
+      const stride = Math.sin(game.clock * 10 + p.number) * 3;
       ctx.beginPath();
-      ctx.moveTo(-9, 12); ctx.lineTo(-15, 23);
-      ctx.moveTo(9, 12); ctx.lineTo(15, 23);
-      ctx.moveTo(-11, -4); ctx.lineTo(-20, 5 + Math.sin(game.clock * 8 + p.number) * 3);
-      ctx.moveTo(11, -4); ctx.lineTo(20, 5 - Math.sin(game.clock * 8 + p.number) * 3);
+      ctx.moveTo(-9, 13); ctx.lineTo(-15, 24 + stride);
+      ctx.moveTo(9, 13); ctx.lineTo(15, 24 - stride);
+      ctx.moveTo(-11, -3); ctx.lineTo(-20, 6 - stride);
+      ctx.moveTo(11, -3); ctx.lineTo(20, 6 + stride);
       ctx.stroke();
-      if (p.hasBall) {
-        ctx.fillStyle = '#7b421d';
-        ctx.strokeStyle = '#fff0c7';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.ellipse(18, 0, 11, 6, .25, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-      }
+      if (p.hasBall) drawRugbyBall(18, -1, .85);
+      ctx.restore();
+    }
+
+    function drawRugbyBall(x, y, scale = 1) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(scale, scale);
+      ctx.fillStyle = '#7b421d';
+      ctx.strokeStyle = '#fff2ca';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 14, 8, .18, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(-6, -3); ctx.lineTo(6, 3);
+      ctx.stroke();
       ctx.restore();
     }
 
     function drawBall() {
-      if (!game.ball || game.ball.owner) return;
-      const b = game.ball;
+      if (!game.ball || (game.carrier && game.carrier.hasBall)) return;
       ctx.save();
-      ctx.translate(b.x, b.y - b.airborne * 35);
+      ctx.translate(game.ball.x, game.ball.y - game.ball.airborne * 42);
       ctx.rotate(game.clock * 8);
-      ctx.fillStyle = '#7b421d';
-      ctx.strokeStyle = '#fff0c7';
-      ctx.lineWidth = 2;
-      ctx.shadowColor = '#ffd166';
-      ctx.shadowBlur = b.airborne > .1 ? 14 : 4;
-      ctx.beginPath();
-      ctx.ellipse(0, 0, 15, 8, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
+      ctx.shadowColor = '#ffd36a';
+      ctx.shadowBlur = game.ball.airborne > .1 ? 18 : 6;
+      drawRugbyBall(0, 0, 1.1);
       ctx.restore();
     }
 
@@ -1090,18 +1115,18 @@
 
     function drawReferee() {
       ctx.save();
-      ctx.translate(W / 2, pitch.y + 38);
+      ctx.translate(field.x + field.w / 2, field.y + 38);
       ctx.fillStyle = '#ffe066';
-      roundRect(-9, -10, 18, 22, 5);
+      roundRect(-9, -9, 18, 22, 5);
       ctx.fill();
-      ctx.fillStyle = '#07111c';
+      ctx.fillStyle = '#07131f';
       ctx.beginPath();
-      ctx.arc(0, -17, 6, 0, Math.PI * 2);
+      ctx.arc(0, -16, 6, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
     }
 
-    function drawPaused() {
+    function drawMessage() {
       if (!game.paused) return;
       ctx.fillStyle = 'rgba(0,0,0,.58)';
       ctx.fillRect(0, 0, W, H);
@@ -1121,6 +1146,13 @@
       ctx.closePath();
     }
 
+    function togglePause() {
+      if (!game.running || game.ended) return;
+      game.paused = !game.paused;
+      ui.pauseBtn.textContent = game.paused ? 'Resume' : 'Pause';
+      log(game.paused ? 'Time off.' : 'Time back on.');
+    }
+
     let last = performance.now();
     function loop(now) {
       const dt = Math.min(.033, (now - last) / 1000);
@@ -1130,22 +1162,14 @@
       requestAnimationFrame(loop);
     }
 
-    function togglePause() {
-      if (!game.running || game.ended) return;
-      game.paused = !game.paused;
-      ui.pauseBtn.textContent = game.paused ? 'Resume' : 'Pause';
-      addLog(game.paused ? 'Time off.' : 'Time back on.');
-    }
-
     window.addEventListener('keydown', e => {
       const key = e.key.toLowerCase();
       if ([' ', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) e.preventDefault();
-      if (!keys.has(key)) justPressed.add(key);
+      if (!keys.has(key)) pressed.add(key);
       if (key === 'p') togglePause();
       keys.add(key);
     });
     window.addEventListener('keyup', e => keys.delete(e.key.toLowerCase()));
-
     ui.startBtn.addEventListener('click', startMatch);
     ui.pauseBtn.addEventListener('click', togglePause);
     ui.restartBtn.addEventListener('click', () => { resetMatch(); startMatch(); });
